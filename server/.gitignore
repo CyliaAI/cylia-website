@@ -40,4 +40,6 @@ Thumbs.db
 
 # Husky hooks (optional, if not committed)
 .husky/_/
-/src/generated/prisma
+
+# Uploads
+uploads/
