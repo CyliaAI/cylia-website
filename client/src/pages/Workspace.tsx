@@ -98,25 +98,18 @@ export default function Flow() {
 
   return (
     <Layout>
-      <div style={{ display: "flex", height: "100vh" }}>
+        <div className="text-center text-xl">Create Your Workflow</div>
+        <div className="text-center">These are the commands AI will be given</div>
+      <div className="flex h-screen">
         {/* Sidebar */}
-        <div style={{ width: 200, padding: 10, borderRight: "1px solid #ddd", background: "#111" }}>
-          <h3 style={{ fontWeight: "bold", marginBottom: 10, color: "#fff" }}>Blocks</h3>
+        <div className="w-52 p-2 border-r border-gray-700 bg-gray-900">
+          <h3 className="font-bold mb-2 text-[#7cfade]">Workflows</h3>
           {nodeTypesList.map((node) => (
             <div
               key={node.type}
               draggable
               onDragStart={(e) => onDragStart(e, node.label)}
-              style={{
-                padding: 10,
-                marginBottom: 8,
-                border: "1px solid #888",
-                borderRadius: 5,
-                cursor: "grab",
-                textAlign: "center",
-                background: "#222",
-                color: "#fff",
-              }}
+              className="p-2 mb-2 border border-gray-600 rounded cursor-grab text-center bg-gray-800 text-[#7cfade]"
             >
               {node.label}
             </div>
@@ -124,7 +117,7 @@ export default function Flow() {
         </div>
 
         {/* Canvas */}
-        <div style={{ flexGrow: 1, height: "100%" }} ref={reactFlowWrapper} tabIndex={0}>
+        <div ref={reactFlowWrapper} tabIndex={0} className="flex-1 h-full">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -135,7 +128,7 @@ export default function Flow() {
             onDragOver={onDragOver}
             fitView
             onInit={setReactFlowInstance}
-            style={{ width: "100%", height: "100%" }}
+            className="w-full h-full"
           >
             <MiniMap />
             <Controls />
