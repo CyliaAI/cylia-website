@@ -1,19 +1,21 @@
 import express from "express";
 import cors from "cors";
-import uploadRoute from "./routes/fileUpload.js";
+import uploadRoutes from "./routes/fileUpload.js";
+import errorHandler from "./middleware/errorHandler.js";
+
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 app.use(cors());
 
-
-
 app.get("/", (req, res) => {
   res.send(`
-    <h1>Welcome to the Transfinitte-25 Backend Server</h1>
+    <h2 style="text-align:center">Welcome to the Transfinitte-25 Backend Server</h2>
   `);
 });
-app.use("/upload", uploadRoute);
+
+app.use("/upload", uploadRoutes);
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
