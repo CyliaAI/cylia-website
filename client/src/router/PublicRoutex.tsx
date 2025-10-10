@@ -1,6 +1,7 @@
 import type { RouteObject } from "react-router-dom"
 import NotFound from "../pages/NotFound"
 import Home from "../pages/Home"
+import Workspace from "../pages/Workspace"
 
 export const publicRoutes: RouteObject[] = [
 	// {
@@ -13,6 +14,11 @@ export const publicRoutes: RouteObject[] = [
         element: <Home />,
         errorElement: <NotFound />,
     },
+	{
+		path:"/workspace",
+		element:<Workspace />,
+		errorElement:<NotFound />
+	},
 	{
 		path: "*",
 		element: <NotFound />,
