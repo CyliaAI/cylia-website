@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { uploadFiles } from "../middlewares/uploadFiles.js";
+import { extractTextFromFile } from "../utils/ocr.js";
 
 const router = Router();
 
@@ -11,8 +12,8 @@ router.post("/", uploadFiles(1).single('file'), async (req, res) => {
     }
 
     // Extract text from the uploaded file
-    const filePath = req.file.path;
-    const extractedText = await extractTextFromFile(filePath);
+    const file = req.file;
+    const extractedText = await extractTextFromFile(file);
 
     res.json({ text: extractedText });
 
