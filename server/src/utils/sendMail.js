@@ -3,7 +3,7 @@ import 'dotenv/config'
 
 
 const SMTP_HOST = process.env.SMTP_HOST
-const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 587
+const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 465
 const SMTP_USER = process.env.SMTP_USER
 const SMTP_PASSWORD = process.env.SMTP_PASSWORD
 const SENDER_EMAIL = process.env.SENDER_EMAIL
