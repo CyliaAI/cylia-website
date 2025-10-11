@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js'
 import flowRoute from './routes/flow.js'
 import workspaceRoutes from './routes/workspaces.js'
 import userRoutes from './routes/users.js'
+import customRoutes from "./routes/customNode.js"
 import chatbotRoutes from './routes/chatbot.js'
 
 const app = express();
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 app.use('/auth',authRoutes);
 app.use("/task", flowRoute);
 app.use('/workspaces', workspaceRoutes);
+app.use("/customNode",customRoutes);
 app.use('/users', userRoutes);
 app.use('/chatbot', chatbotRoutes)
 

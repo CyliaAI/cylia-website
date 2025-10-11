@@ -3,6 +3,7 @@ import NotFound from "../pages/NotFound"
 import Home from "../pages/Home"
 import Workspace from "../pages/Workspace"
 import Login from "../pages/Login"
+import CodeEditor from "../pages/codeEditor"
 
 export const publicRoutes: RouteObject[] = [
 	// {
@@ -24,6 +25,11 @@ export const publicRoutes: RouteObject[] = [
 		path:"/workspace/:id",
 		element:<Workspace />,
 		errorElement:<NotFound />
+	},
+	{
+		path: "/code-editor",
+		element: <CodeEditor />,
+		errorElement: <NotFound />,
 	},
 	{
 		path: "*",
