@@ -1,4 +1,3 @@
-import { uploadFiles } from "../middlewares/uploadFiles.js";
 import axios from "axios";
 import 'dotenv/config'
 
@@ -22,5 +21,16 @@ export const rag = async (model, text) => {
     return response.data.summary;
   } catch (error) {
     console.error("Error in RAG:", error);
+  }
+};
+
+export const chatbot = async (model, text) => {
+  try {
+    const response = await axios.post(`${process.env.ML_SERVER}/api/chatbot`, { model_name: model, text }, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return response.data.summary;
+  } catch (error) {
+    console.error("Error Summarizing Text:", error);
   }
 };

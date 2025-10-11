@@ -8,6 +8,7 @@
     "dev": "nodemon src/index.js",
     "build": "tsc",
     "start": "node src/index.js",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md,css,scss}\"",
     "lint": "eslint \"src/**/*.js\"",
     "lint:fix": "eslint \"src/**/*.js\" --fix",
     "prisma:generate": "prisma generate",

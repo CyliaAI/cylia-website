@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js'
 import flowRoute from './routes/flow.js'
 import workspaceRoutes from './routes/workspaces.js'
 import userRoutes from './routes/users.js'
+import chatbotRoutes from './routes/chatbot.js'
 
 const app = express();
 app.use(express.json())
@@ -27,7 +28,8 @@ app.get("/", (req, res) => {
 app.use('/auth',authRoutes);
 app.use("/task", flowRoute);
 app.use('/workspaces', workspaceRoutes);
-app.use('/users', userRoutes)
+app.use('/users', userRoutes);
+app.use('/chatbot', chatbotRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
