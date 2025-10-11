@@ -12,9 +12,21 @@ export const summarise = async (model, text) => {
   }
 };
 
-export const rag = async (model, text) => {
+export const toVectorDB = async (userId, model, text) => {
   try {
-    const response = await axios.post(`${process.env.ML_SERVER}/api/rag`, { model_name: model, text }, {
+    const response = await axios.post(`${process.env.ML_SERVER}/api/add-docs`, { userId, model_name: model, text }, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    return response.data.success;
+  } catch (error) {
+    console.error("Error in Adding Documents:", error);
+  }
+};
+
+export const rag = async (userId, model, query) => {
+  try {
+    const response = await axios.post(`${process.env.ML_SERVER}/api/query`, { userId, model_name: model, query }, {
       headers: { "Content-Type": "application/json" },
     });
 

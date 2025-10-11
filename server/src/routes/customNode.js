@@ -35,7 +35,7 @@ router.post("/save-code", validateBody([
         },
       },
       update: {
-        code, // overwrite existing code
+        code,
       },
       create: {
         userId: user.id,
@@ -52,15 +52,15 @@ router.post("/save-code", validateBody([
 });
 
 
-router.post("/run-code", async (req, res) => {
+router.post("/run-code", validateBody([
+  { key: "userId", type: "number", required: true },
+  { key: "codeName", type: "string", required: true },
+  { key: "input", type: "string", required: true },
+]), async (req, res) => {
   const { userId, codeName, input } = req.body;
-  console.log(req.body)
-  if (!userId || !codeName) {
-    return res.status(400).json({ error: "userId and codeName are required" });
-  }
 
   try {
-    // Fetch code from database
+    // Fetch Code from DB
     const customCode = await prisma.customCode.findFirst({
       where: {
         userId: parseInt(userId),
@@ -74,11 +74,11 @@ router.post("/run-code", async (req, res) => {
     
     const code = customCode.code;
 
-    // Create a VM sandbox
+    // Create a VM Sandbox
     const vm = new NodeVM({
-      console: "off",   // disable console.log
+      console: "off",   // Disable console access
       sandbox: {},
-      timeout: 1000,    // max execution 1 second
+      timeout: 1000,    // Max Exectution Time
       eval: false,
       wasm: false,
     });

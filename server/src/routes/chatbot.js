@@ -10,8 +10,8 @@ router.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Model and text are required" });
     }
 
-    const summary = await chatbot(model, text);
-    res.json({ summary });
+    const result = await chatbot(model, text);
+    res.json({ result });
   } catch (error) {
     console.error("Error in /chat:", error);
     res.status(500).json({ error: "Internal Server Error" });
