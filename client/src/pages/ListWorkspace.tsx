@@ -35,7 +35,7 @@ export const ListWorkspace = () => {
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/workspaces/get`,
-          { userId: id },
+          { userId: Number(id) },
           { withCredentials: true }
         );
         setTeams(response.data.teams);
@@ -49,7 +49,7 @@ export const ListWorkspace = () => {
 
   const viewWorkspace = (project: any) => {
     try {
-      navigate(`/workspace/personal/${project.id}`);
+      navigate(`/workspace/${project.id}`);
     } catch (err) {
       console.log(err);
     }
