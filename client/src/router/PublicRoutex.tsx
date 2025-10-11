@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router-dom"
 import NotFound from "../pages/NotFound"
 import Home from "../pages/Home"
 import Workspace from "../pages/Workspace"
+import Login from "../pages/Login"
 
 export const publicRoutes: RouteObject[] = [
 	// {
@@ -12,6 +13,11 @@ export const publicRoutes: RouteObject[] = [
     {
         path: "/",
         element: <Home />,
+        errorElement: <NotFound />,
+    },
+	{
+        path: "/login",
+        element: <Login />,
         errorElement: <NotFound />,
     },
 	{
