@@ -22,6 +22,8 @@ import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
 import UploadBox from '@/components/Workspace/UploadBox';
 import SchedulePicker from '@/components/Workspace/SchedulePicker';
+import { useGlobalContext } from '@/context/GlobalContext';
+import { useParams } from 'react-router-dom';
 
 interface AIFlowNodeData {
   label: string;
@@ -54,6 +56,8 @@ const initialNodes: Node<AIFlowNodeData>[] = [
 const initialEdges: Edge[] = [];
 
 export default function Flow() {
+  const { id } = useGlobalContext();
+  const { workspaceId } = useParams<{ workspaceId: string }>();
   const [nodes, setNodes] = useState<Node<AIFlowNodeData>[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const [nodeInputValues, setNodeInputValues] = useState<NodeInputValues>({});
@@ -88,7 +92,7 @@ export default function Flow() {
       },
     }));
 
-    const flow = { nodes: serializableNodes, edges };
+    const flow = { nodes: serializableNodes, edges, id, workspaceId };
     const compressed = LZString.compressToBase64(JSON.stringify(flow));
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
@@ -320,10 +324,18 @@ export default function Flow() {
 
   useEffect(() => {
     const flow = loadFlowFromCookie();
-    if (flow.nodes.length > 0) {
+    if (flow.id === id && flow.workspaceId == workspaceId && flow.nodes.length > 0) {
       setNodes(flow.nodes);
       setEdges(flow.edges);
       toast.success('Previous session flow loaded');
+    } else {
+      axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/get-flow`, {workspaceId})
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.error(err);
+      })
     }
   }, []);
 
