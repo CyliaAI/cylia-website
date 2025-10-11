@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,13 +8,47 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  email          String    @unique
-  name           String?
-  password       String?
-  createdAt      DateTime  @default(now())
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?
+  password  String?
+  createdAt DateTime  @default(now())
+
+  workspaces Workspace[]
+  teams   TeamMember[]
+}
+
+model Workspace {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  workflow  Json?
+
+  owner     User      @relation(fields: [ownerId], references: [id])
+  ownerId   Int
+
+  team      Team?     @relation(fields: [teamId], references: [id])
+  teamId    Int?      @unique
 }
 
 model Team {
-  id             Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+
+  members   TeamMember[]
 }
+
+model TeamMember {
+  userId  Int
+  teamId  Int
+
+  user    User @relation(fields: [userId], references: [id])
+  team    Team @relation(fields: [teamId], references: [id])
+
+  @@id([userId, teamId])
+}
+

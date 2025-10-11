@@ -1,15 +1,16 @@
 import { Worker } from "bullmq";
-import { flowQueue } from "../workers/flowQueue.js";
 import { flowQueue } from "../workers/flowQueue.js"; // BullMQ Queue instance
 import { sendMail } from "../utils/sendMail.js";
+import { extractTextFromFile } from "../utils/ocr.js";
+import { uploadFiles } from "../middlewares/uploadFiles.js";
+import { summarise, rag } from "../utils/ml.js";
 import { extractTextFromFile } from "../utils/ocr.js";
 import { uploadFiles } from "../middlewares/uploadFiles.js";
 import { summarise, rag } from "../utils/ml.js";
 
 // Define Tasks which are asynchronous
 const uploadPDF = async (ctx) => {
-  console.log("upload");
-  await new Promise((r) => setTimeout(r, 200)); 
+  // No Functionality as of now
   return ctx;
 };
 
@@ -74,5 +75,3 @@ const worker = new Worker(
 // --- Listen to events ---
 worker.on("completed", (job) => console.log(`Job ${job.id} fully completed`));
 worker.on("failed", (job, err) => console.error(`Job ${job.id} failed:`, err));
-
-console.log("Worker ready and listening for jobs...");

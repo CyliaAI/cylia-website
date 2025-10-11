@@ -2,8 +2,7 @@ import { Router } from "express";
 import axios from "axios";
 import jwt from 'jsonwebtoken'
 import 'dotenv/config';
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
