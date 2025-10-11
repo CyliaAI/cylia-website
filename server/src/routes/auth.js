@@ -15,7 +15,7 @@ const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 
 
 
-const getToken = (id,name,email,role,)=>{
+const getToken = (id, name, email, role,)=>{
     return jwt.sign({id,name,email,role,},SECRET);
 }
 

@@ -1,6 +1,8 @@
 const Chatbot = () => {
   return (
-    <div>Chatbot</div>
+    <div className="mt-14">
+        What
+    </div>
   )
 }
 

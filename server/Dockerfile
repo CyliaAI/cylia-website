@@ -21,19 +21,20 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy only compiled JS and package.json (runtime dependencies)
 COPY package*.json ./
 RUN npm install --production
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.env .env
+
+# install postgres client for pg_isready
+RUN apk add --no-cache postgresql-client
 
 RUN npx prisma generate
 
-# Expose your app port
-EXPOSE 8000
+COPY start.sh .
+RUN chmod +x start.sh
 
-CMD ["npx", "nodemon", "dist/index.js"]
+EXPOSE 8000
+CMD ["./start.sh"]

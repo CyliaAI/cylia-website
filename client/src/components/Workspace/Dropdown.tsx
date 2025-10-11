@@ -3,17 +3,25 @@ import { useState } from "react";
 interface DropdownProps {
   label: string;
   options: string[];
-  onSelect?: (value: string) => void;
+  nodeLabel?: string;
+  onValueChange?: (nodeLabel: string, value: string) => void;
 }
 
-export default function Dropdown({ label, options, onSelect }: DropdownProps) {
+export default function Dropdown({
+  label,
+  options,
+  nodeLabel,
+  onValueChange,
+}: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
   const handleSelect = (option: string) => {
     setSelected(option);
     setIsOpen(false);
-    onSelect?.(option);
+    if (nodeLabel && onValueChange) {
+      onValueChange(nodeLabel, option);
+    }
   };
 
   return (

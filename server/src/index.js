@@ -22,7 +22,8 @@ app.get("/", (req, res) => {
   `);
 });
 
-app.use('/auth',authRoutes)
+app.use('/auth', authRoutes)
+app.use("/upload", uploadRoute);
 app.use("/task", flowRoute)
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
