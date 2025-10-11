@@ -23,7 +23,7 @@ import EmailForm from '@/components/Workspace/EmailForm';
 import UploadBox from '@/components/Workspace/UploadBox';
 import SchedulePicker from '@/components/Workspace/SchedulePicker';
 import { useGlobalContext } from '@/context/GlobalContext';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 
 interface AIFlowNodeData {
   label: string;
@@ -58,6 +58,7 @@ const initialEdges: Edge[] = [];
 export default function Flow() {
   const { id } = useGlobalContext();
   const { workspaceId } = useParams<{ workspaceId: string }>();
+  const [isValid, setIsValid] = useState<boolean>(true)
   const [nodes, setNodes] = useState<Node<AIFlowNodeData>[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const [nodeInputValues, setNodeInputValues] = useState<NodeInputValues>({});
@@ -323,20 +324,22 @@ export default function Flow() {
 
 
   useEffect(() => {
-    const flow = loadFlowFromCookie();
-    if (flow.id === id && flow.workspaceId == workspaceId && flow.nodes.length > 0) {
-      setNodes(flow.nodes);
-      setEdges(flow.edges);
-      toast.success('Previous session flow loaded');
-    } else {
-      axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/get-flow`, {workspaceId})
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/get-workflow`, {workspaceId: Number(workspaceId)})
       .then(res => {
-        console.log(res);
+        const flow = loadFlowFromCookie();
+        if (flow.id === id && flow.workspaceId == workspaceId && flow.nodes.length > 0) {
+          setNodes(flow.nodes);
+          setEdges(flow.edges);
+          toast.success('Previous session flow loaded');
+        } else {
+          setNodes(res.data.workflow.nodes);
+          setEdges(res.data.workflow.edges);
+        }
       })
       .catch(err => {
+        setIsValid(false);
         console.error(err);
       })
-    }
   }, []);
 
   useEffect(() => {
@@ -346,6 +349,7 @@ export default function Flow() {
 
   return (
     <Layout showFooter={false}>
+      {!isValid && <Navigate to="/not-found"/>}
       {exportPop && (
         <div className='min-h-screen w-full fixed bg-black/50 z-[100]'>
 

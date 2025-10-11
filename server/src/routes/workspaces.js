@@ -150,6 +150,7 @@ router.post('/get-workflow', validateBody([
 ]), async(req, res) => {
     try {
         const { workspaceId } = req.body;
+        console.log(workspaceId);
         const workspace = await prisma.personalWorkspace.findUnique({
             where: { id: workspaceId },
             select: { workflow: true }
