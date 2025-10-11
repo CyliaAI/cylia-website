@@ -1,18 +1,15 @@
 import express from "express";
 import { flowQueue } from "../workers/flowQueue.js";
+import { uploadFiles } from "../middlewares/uploadFiles.js";
 
 const router = express.Router();
 
-router.post("/run-flow", async (req, res) => {
+router.post("/run-flow", uploadFiles(1).single('file'), async (req, res) => {
   try {
+    let { flow, data } = req.body;
 
-    console.log(req.body)
-
-    const { flow, data } = req.body;
-
-    console.log("Flow:", flow);
-    console.log("Data:", data);
-
+    flow, data = JSON.parse(flow), JSON.parse(data);
+    data.file = req.file;
     if (!Array.isArray(flow)) {
       return res.status(400).json({ error: "Flow must be an array of steps" });
     }

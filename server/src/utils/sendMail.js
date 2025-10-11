@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer'
 import 'dotenv/config'
 
-
 const SMTP_HOST = process.env.SMTP_HOST
 const SMTP_PORT = parseInt(process.env.SMTP_PORT, 10) || 465
 const SMTP_USER = process.env.SMTP_USER
@@ -36,3 +35,4 @@ export const sendMail= async(to, subject, html) => {
         });
 };
 
+sendMail("pranavsaravanan.r@gmail.com", "Test Email", "<h1>This is a test email</h1><p>Sent using Node.js and Nodemailer</p>")

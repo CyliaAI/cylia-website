@@ -21,3 +21,6 @@ model User {
   createdAt      DateTime  @default(now())
 }
 
+model Team {
+  id             Int      @id @default(autoincrement())
+}

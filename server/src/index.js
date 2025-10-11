@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import uploadRoute from "./routes/uploads.js";
 import authRoutes from './routes/auth.js'
 import flowRoute from './routes/flow.js'
 
@@ -24,7 +23,6 @@ app.get("/", (req, res) => {
 });
 
 app.use('/auth',authRoutes)
-app.use("/upload", uploadRoute);
 app.use("/task", flowRoute)
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

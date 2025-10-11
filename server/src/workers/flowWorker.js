@@ -1,34 +1,41 @@
 // flowWorkerMQ.js
 import { Worker } from "bullmq";
-import { flowQueue } from "../workers/flowQueue.js"; // your BullMQ Queue instance
+import { flowQueue } from "../workers/flowQueue.js"; // BullMQ Queue instance
 import { sendMail } from "../utils/sendMail.js";
+import { extractTextFromFile } from "../utils/ocr.js";
+import { uploadFiles } from "../middlewares/uploadFiles.js";
+import { summarise, rag } from "../utils/ml.js";
 
-// --- Define your tasks ---
-// Make all tasks async for consistency
+// Define Tasks which are asynchronous
 const uploadPDF = async (ctx) => {
-  console.log("upload");
-  await new Promise((r) => setTimeout(r, 200)); // simulate async work
+  // No Functionality here
   return ctx;
 };
 
 const ocr = async (ctx) => {
-  console.log("ocr");
-  await new Promise((r) => setTimeout(r, 200));
+  await extractTextFromFile(ctx.file).then((text) => {
+    ctx.content = text;
+  });
   return ctx;
 };
 
 const summarize = async (ctx) => {
-  console.log("summ");
-  await new Promise((r) => setTimeout(r, 200));
+  const summary = await summarise(ctx.model, ctx.content);
+  ctx.content = summary;
   return ctx;
 };
 
+const rag = async (ctx) => {
+  const retrieved_text = await rag(ctx.model, ctx.content);
+  ctx.content = retrieved_text;
+  return ctx;
+}
+
 const sendEmail = async (ctx) => {
-    console.log("in send mail")
-    await sendMail(ctx.email, "nigga", "chigga")
+    await sendMail(ctx.email, "Automated Email from Cylia", ctx.content)
     return ctx;
 }
-// Map of task names → functions
+// Map of Task Names
 const taskMap = {
   uploadPDF,
   ocr,
@@ -38,7 +45,7 @@ const taskMap = {
 
 // --- Create a worker ---
 const worker = new Worker(
-  flowQueue.name, // the name of your queue
+  flowQueue.name, // Queue Name
   async (job) => {
     console.log("Processing job:", job.id);
 
