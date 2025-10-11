@@ -89,6 +89,19 @@ export default function Flow() {
     }));
 
     const flow = { nodes: serializableNodes, edges };
+    const serializableNodes = nodes.map(({ id, type, position, data, style }) => ({
+      id,
+      type,
+      position,
+      style,
+      data: {
+        label: data.label,
+        type: data.type,
+        style: data.style,
+      },
+    }));
+
+    const flow = { nodes: serializableNodes, edges };
     const compressed = LZString.compressToBase64(JSON.stringify(flow));
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
