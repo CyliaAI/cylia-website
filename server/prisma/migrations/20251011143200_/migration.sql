@@ -10,15 +10,14 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Workspace" (
+CREATE TABLE "PersonalWorkspace" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "workflow" JSONB,
     "ownerId" INTEGER NOT NULL,
-    "teamId" INTEGER,
+    "workflow" JSONB,
 
-    CONSTRAINT "Workspace_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "PersonalWorkspace_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -26,7 +25,8 @@ CREATE TABLE "Team" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "workspaceId" INTEGER NOT NULL,
+    "ownerId" INTEGER NOT NULL,
+    "workflow" JSONB,
 
     CONSTRAINT "Team_pkey" PRIMARY KEY ("id")
 );
@@ -42,17 +42,11 @@ CREATE TABLE "TeamMember" (
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
--- CreateIndex
-CREATE UNIQUE INDEX "Workspace_teamId_key" ON "Workspace"("teamId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Team_workspaceId_key" ON "Team"("workspaceId");
+-- AddForeignKey
+ALTER TABLE "PersonalWorkspace" ADD CONSTRAINT "PersonalWorkspace_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Workspace" ADD CONSTRAINT "Workspace_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Team" ADD CONSTRAINT "Team_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Team" ADD CONSTRAINT "Team_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TeamMember" ADD CONSTRAINT "TeamMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

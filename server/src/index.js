@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 
 app.use('/auth',authRoutes);
 app.use("/task", flowRoute);
-app.use('/workspace', workspaceRoutes);
+app.use('/workspaces', workspaceRoutes);
 app.use('/users', userRoutes)
 
 app.listen(PORT, () => {

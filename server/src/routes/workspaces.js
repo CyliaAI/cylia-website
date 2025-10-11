@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 const router = Router();
 
-router.post('/create-team', validateBody[
+router.post('/create-team', validateBody([
     { key: 'userId', type: 'number', required: true },
     { key: 'name', type: 'string', required: true },
     { key: 'description', type: 'string' }
-], async (req, res) => {
+]), async (req, res) => {
     try {
         const { userId, name, description } = req.body;
 

@@ -35,4 +35,3 @@ export const sendMail= async(to, subject, html) => {
         });
 };
 
-sendMail("pranavsaravanan.r@gmail.com", "Test Email", "<h1>This is a test email</h1><p>Sent using Node.js and Nodemailer</p>")
