@@ -3,8 +3,38 @@ import { flowQueue } from "../workers/flowQueue.js";
 import schedule from 'node-schedule';
 import { uploadFiles } from "../middlewares/uploadFiles.js";
 import validateBody from "../middlewares/validateBody.js";
+import { pdf } from "pdf-to-img";
+
+import path from "path";
+import { promises as fs } from "fs";
+
 
 const router = express.Router();
+
+async function pdfImg(pdfPath) {
+  const outputDir = path.join("uploads", `${path.basename(pdfPath)}_images`);
+
+  try {
+    await fs.mkdir(outputDir, { recursive: true });
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
+  }
+
+
+  const document = await pdf(pdfPath, { scale: 3 });
+  let counter = 1;
+  const imagePaths = [];
+
+  for await (const image of document) {
+    const imgPath = path.join(outputDir, `page-${counter}.png`);
+    await fs.writeFile(imgPath, image);
+    imagePaths.push(imgPath);
+    counter++;
+  }
+
+  return imagePaths;
+}
+
 
 router.post("/run-flow", uploadFiles().single('file'), validateBody([
   { key: 'flow', type: 'string', required: true },
@@ -14,8 +44,13 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
     console.log(req.file)
     let { flow, data } = req.body;
 
+
     flow = flow || '[]';
     data = data || '{}';
+
+    console.log(req.file)
+
+    console.log(req.body)
 
     try {
       flow = JSON.parse(flow);
@@ -29,8 +64,25 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
       return res.status(400).json({ error: "Invalid JSON in data" });
     }
 
+    data.isPdf = false;
+
     if (req.file) {
-      data.file = req.file;
+      if (req.file.mimetype === "application/pdf") {
+        const imagePaths = await pdfImg(req.file.path);
+        data.isPdf = true;
+
+        // Replace req.file with an array of image objects
+        data.file = imagePaths.map((p) => ({
+          path: p,
+          mimetype: "image/png",
+          originalname: path.basename(p),
+        }));
+
+      }
+      else {
+        data.file = req.file;
+      }
+
     } else {
       data.file = null;
     }

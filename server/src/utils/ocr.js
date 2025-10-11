@@ -10,21 +10,16 @@ import { createWorker } from "tesseract.js";
 export async function extractTextFromFile(file) {
   if (!file) throw new Error("No file provided");
 
-  // Create a worker (no logger in Node)
   const worker = await createWorker();
 
   try {
-    // Recognize text directly
     const { data } = await worker.recognize(file.path);
-
-    return data.text;
+    return data.text
+    +`
+    pppppppppp`
+  } catch (err) {
+    console.error("OCR failed:", err);
   } finally {
-    // Terminate worker
-    await worker.terminate().catch((err) => console.error("Worker terminate failed:", err));
-
-    // Delete uploaded file
-    fs.unlink(file.path, (err) => {
-      if (err) console.error("Failed to delete file:", err);
-    });
+    await worker.terminate();
   }
 }

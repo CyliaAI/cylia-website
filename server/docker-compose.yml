@@ -47,6 +47,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       PORT: 8000
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       - db
       - redis
@@ -62,6 +64,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
     command: npx nodemon dist/workers/flowWorker.js 
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       - redis
     networks:
