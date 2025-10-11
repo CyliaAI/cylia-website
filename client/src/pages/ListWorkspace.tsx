@@ -55,12 +55,20 @@ export const ListWorkspace = () => {
     }
   };
 
+  const viewTeamWorkspace = (team: any) => {
+    try {
+    console.log(team)
+      navigate(`/workspace/${team.id}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Layout>
       <PrivateRoute />
       <div className="bg-gray-900 min-h-screen pt-10 text-white p-6">
 
-        {/* Teams Section */}
         <div className="mb-10">
           <h2 className="text-4xl font-bold text-purple-400 mb-6 text-center">
             Teams
@@ -69,7 +77,7 @@ export const ListWorkspace = () => {
           <div className="flex justify-start px-10 mb-4">
             <button
               onClick={() => setClickTeam(!clickTeam)}
-              className="bg-green-500 px-10 cursor-pointer font-bold hover:bg-green-600 text-white py-2 rounded shadow-md"
+              className="bg-green-500 px-10 mb-4 cursor-pointer font-bold hover:bg-green-600 text-white py-2 rounded shadow-md"
             >
               + Create Team
             </button>
@@ -89,20 +97,28 @@ export const ListWorkspace = () => {
                 <p className="text-gray-300 font-medium">
                   Members: {team.members.length}
                 </p>
+                <div className="flex justify-end">
+                <button
+                  onClick={() => viewTeamWorkspace(team)}
+                  className="mt-2 cursor-pointer bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-4 rounded"
+                >
+                  Open
+                </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mb-10 mt-10">
-          <h2 className="text-2xl font-bold text-purple-400 mb-6 text-center">
+        <div className="mb-10 mt-20">
+          <h2 className="text-4xl font-bold text-purple-400 mb-6 text-center">
             Personal Workspace
           </h2>
 
           <div className="flex px-10 justify-start mb-4">
             <button
               onClick={() => setClickPers(!clickPers)}
-              className="bg-green-500 font-bold cursor-pointer hover:bg-green-600 text-white px-4 py-2 rounded shadow-md"
+              className="bg-green-500 mb-4 font-bold cursor-pointer hover:bg-green-600 text-white px-4 py-2 rounded shadow-md"
             >
               + Create Personal Workspace
             </button>
@@ -130,7 +146,6 @@ export const ListWorkspace = () => {
           </div>
         </div>
 
-        {/* Popups */}
         {clickPers && <PersonalPopUp onClose={() => setClickPers(false)} />}
         {clickTeam && <PopupTeam onClose={() => setClickTeam(false)} />}
         {selectedTeam && (

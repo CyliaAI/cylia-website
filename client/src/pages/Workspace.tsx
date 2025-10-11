@@ -22,7 +22,6 @@ import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
 import UploadBox from '@/components/Workspace/UploadBox';
 import SchedulePicker from '@/components/Workspace/SchedulePicker';
-import UploadBox from '@/components/Workspace/UploadBox';
 
 interface AIFlowNodeData {
   label: string;
