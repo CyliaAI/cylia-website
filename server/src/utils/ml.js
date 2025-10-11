@@ -1,9 +1,10 @@
 import { uploadFiles } from "../middlewares/uploadFiles.js";
 import axios from "axios";
+import 'dotenv/config'
 
 export const summarise = async (model, text) => {
   try {
-    const response = await axios.post("http://10.231.221.121:5000/api/summarize", { model_name: model, text }, {
+    const response = await axios.post(`http://${ML_SERVER}/api/summarize`, { model_name: model, text }, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -15,7 +16,7 @@ export const summarise = async (model, text) => {
 
 export const rag = async (model, text) => {
   try {
-    const response = await axios.post("http://10.231.221.121:5000/api/rag", { model_name: model, text }, {
+    const response = await axios.post(`http://${ML_SERVER}/api/rag`, { model_name: model, text }, {
       headers: { "Content-Type": "application/json" },
     });
 

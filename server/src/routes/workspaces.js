@@ -18,6 +18,7 @@ router.post('/create-team', validateBody([
                 name,
                 description,
                 ownerId: userId,
+                workflow: { nodes: [], edges: [] }
             }
         });
         //No description in schema
@@ -57,7 +58,7 @@ router.post('/get', validateBody([
                         name: true,
                         description: true,
                         members: true,
-                        workspace: true,
+                        workflow: true,
                     }
                 }
             }  
@@ -66,6 +67,27 @@ router.post('/get', validateBody([
     } catch(err) {
         console.error("Server Error: ", err);
         res.status(500).json({ error: 'Failed to get Workspaces' + err})
+    }
+});
+
+router.post('/create-personal-workspace', validateBody([
+    { key: 'userId', type: 'number', required: true },
+    { key: 'name', type: 'string', required: true },
+    { key: 'description', type: 'string' }
+]), async (req, res) => {
+    try {
+        const { userId, name, description } = req.body;
+        const workspace = await prisma.personalWorkspace.create({
+            data: {
+                name,
+                description,
+                ownerId: userId,
+                workflow: { nodes: [], edges: [] }
+            }
+        });
+        res.status(201).json({ workspace });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create workspace' });
     }
 });
 

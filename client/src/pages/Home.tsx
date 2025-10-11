@@ -10,6 +10,7 @@ type Team = {
   name: string;
   description: string;
   members: Array<unknown>;
+  workflow: unknown;
 };
 
 type personalWorkspace = {

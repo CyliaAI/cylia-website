@@ -10,13 +10,16 @@ interface ViewteamProps {
     name: string;
     description: string;
     members: Array<unknown>;
+    workflow: unknown;
   };
   onClose: () => void;
 }
 
 export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
   const [search, setSearch] = useState("");               
-  const [debouncedSearch] = useDebounce(search, 500);   
+  const [debouncedSearch] = useDebounce(search, 500); 
+    
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userResult, setUserResult] = useState<any>(null); 
   const {id} = useContext(GlobalContext);
 
