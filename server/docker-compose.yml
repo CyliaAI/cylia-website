@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: postgres:14-alpine
@@ -23,6 +25,15 @@ services:
     networks:
       - backend
 
+  redis:
+    image: redis:7-alpine
+    container_name: tf_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
   api:
     build:
       context: .
@@ -33,11 +44,29 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgres://root:password@db:5432/tfdb?sslmode=disable
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       PORT: 8000
     depends_on:
       - db
+      - redis
     networks:
       - backend
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tf_worker
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    command: npx nodemon dist/workers/flowWorker.js 
+    depends_on:
+      - redis
+    networks:
+      - backend
+
 
 volumes:
   pgdata:
