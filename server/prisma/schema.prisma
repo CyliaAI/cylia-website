@@ -14,21 +14,18 @@ model User {
   password  String?
   createdAt DateTime  @default(now())
 
-  workspaces Workspace[]
+  workspaces PersonalWorkspace[]
   teams   TeamMember[]
 }
 
-model Workspace {
+model PersonalWorkspace {
   id        Int       @id @default(autoincrement())
   name      String
   createdAt DateTime  @default(now())
-  workflow  Json?
-
+  
   owner     User      @relation(fields: [ownerId], references: [id])
   ownerId   Int
-
-  team      Team?     @relation(fields: [teamId], references: [id])
-  teamId    Int?      @unique
+  workflow  Json?
 }
 
 model Team {
@@ -36,8 +33,9 @@ model Team {
   name      String
   createdAt DateTime  @default(now())
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId Int
+  owner     User      @relation(fields: [ownerId], references: [id])
+  ownerId   Int
+  workflow  Json?
 
   members   TeamMember[]
 }
@@ -51,4 +49,3 @@ model TeamMember {
 
   @@id([userId, teamId])
 }
-

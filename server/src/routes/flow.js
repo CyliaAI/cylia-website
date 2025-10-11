@@ -2,12 +2,16 @@ import express from "express";
 import { flowQueue } from "../workers/flowQueue.js";
 import schedule from 'node-schedule';
 import { uploadFiles } from "../middlewares/uploadFiles.js";
+import validateBody from "../middlewares/validateBody.js";
 
 const router = express.Router();
 
 router.post("/run-flow", uploadFiles(1).single('file'), async (req, res) => {
   try {
     let { flow, data } = req.body;
+    if (!flow || !data) {
+      return res.status(400).json({ error: "Flow and data are required" });
+    }
 
     flow, data = JSON.parse(flow), JSON.parse(data);
     data.file = req.file;
@@ -28,6 +32,9 @@ router.post("/run-flow", uploadFiles(1).single('file'), async (req, res) => {
 router.post("/schedule", async (req, res) => {
   try {
     const { flow, data } = req.body;
+    if (!flow || !data) {
+      return res.status(400).json({ error: "Flow and data are required" });
+    }
 
     if (!Array.isArray(flow)) {
       return res.status(400).json({ error: "Flow must be an array of steps" });

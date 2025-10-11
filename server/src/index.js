@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from './routes/auth.js'
 import flowRoute from './routes/flow.js'
+import workspaceRoutes from './routes/workspaces.js'
+import userRoutes from './routes/users.js'
 
 const app = express();
 app.use(express.json())
@@ -22,9 +24,11 @@ app.get("/", (req, res) => {
   `);
 });
 
-app.use('/auth', authRoutes)
-app.use("/upload", uploadRoute);
-app.use("/task", flowRoute)
+app.use('/auth',authRoutes);
+app.use("/task", flowRoute);
+app.use('/workspace', workspaceRoutes);
+app.use('/users', userRoutes)
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -4,9 +4,6 @@ import { sendMail } from "../utils/sendMail.js";
 import { extractTextFromFile } from "../utils/ocr.js";
 import { uploadFiles } from "../middlewares/uploadFiles.js";
 import { summarise, rag } from "../utils/ml.js";
-import { extractTextFromFile } from "../utils/ocr.js";
-import { uploadFiles } from "../middlewares/uploadFiles.js";
-import { summarise, rag } from "../utils/ml.js";
 
 // Define Tasks which are asynchronous
 const uploadPDF = async (ctx) => {
@@ -27,7 +24,7 @@ const summarize = async (ctx) => {
   return ctx;
 };
 
-const rag = async (ctx) => {
+const ragFn = async (ctx) => {
   const retrieved_text = await rag(ctx.model, ctx.content);
   ctx.content = retrieved_text;
   return ctx;
@@ -39,9 +36,9 @@ const sendEmail = async (ctx) => {
 }
 // Map of Task Names
 const taskMap = {
-  scheduleTask,
   uploadPDF,
   ocr,
+  ragFn,
   summarize,
   sendEmail,
 };
