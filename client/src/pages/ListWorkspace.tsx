@@ -49,7 +49,7 @@ export const ListWorkspace = () => {
 
   const viewWorkspace = (project: any) => {
     try {
-      navigate(`/workspace/${project.id}`);
+      navigate(`/workspace/personal/${project.id}`);
     } catch (err) {
       console.log(err);
     }
@@ -58,7 +58,7 @@ export const ListWorkspace = () => {
   const viewTeamWorkspace = (team: any) => {
     try {
     console.log(team)
-      navigate(`/workspace/${team.id}`);
+      navigate(`/workspace/team/${team.id}`);
     } catch (err) {
       console.log(err);
     }

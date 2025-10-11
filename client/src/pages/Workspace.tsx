@@ -151,7 +151,7 @@ export default function Flow() {
     },
     {
       type: 'MID',
-      label: 'VectorDB',
+      label: 'To VectorDB',
       component: <Dropdown label="Select DB" options={['Faiss', 'pgvector', 'Pinecone', 'Qdrant (Managed)']} />,
     },
     {
