@@ -70,14 +70,14 @@ export const ListWorkspace = () => {
       <div className="bg-gray-900 min-h-screen pt-10 text-white p-6">
 
         <div className="mb-10">
-          <h2 className="text-4xl font-bold text-purple-400 mb-6 text-center">
+          <h2 className="text-4xl font-bold text-teal-500 mb-6 text-center">
             Teams
           </h2>
 
           <div className="flex justify-start px-10 mb-4">
             <button
               onClick={() => setClickTeam(!clickTeam)}
-              className="bg-green-500 px-10 mb-4 cursor-pointer font-bold hover:bg-green-600 text-white py-2 rounded shadow-md"
+              className="bg-green-600 px-10 mb-4 cursor-pointer font-bold hover:bg-green-700 text-white py-2 rounded shadow-md"
             >
               + Create Team
             </button>
@@ -88,7 +88,7 @@ export const ListWorkspace = () => {
               <div
                 key={index}
                 onClick={() => setSelectedTeam(team)}
-                className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-indigo-500/50"
+                className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-teal-500/30"
               >
                 <h3 className="text-xl font-semibold text-indigo-300 mb-2">
                   {team.name}
@@ -111,14 +111,14 @@ export const ListWorkspace = () => {
         </div>
 
         <div className="mb-10 mt-20">
-          <h2 className="text-4xl font-bold text-purple-400 mb-6 text-center">
+          <h2 className="text-4xl font-bold text-teal-500 mb-6 text-center">
             Personal Workspace
           </h2>
 
           <div className="flex px-10 justify-start mb-4">
             <button
               onClick={() => setClickPers(!clickPers)}
-              className="bg-green-500 mb-4 font-bold cursor-pointer hover:bg-green-600 text-white px-4 py-2 rounded shadow-md"
+              className="bg-green-600 mb-4 font-bold cursor-pointer hover:bg-green-700 text-white px-4 py-2 rounded shadow-md"
             >
               + Create Personal Workspace
             </button>
@@ -128,12 +128,12 @@ export const ListWorkspace = () => {
             {personalWorkspaces.map((project, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300 hover:shadow-pink-500/50"
+                className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300 hover:shadow-teal-500/30"
               >
-                <h3 className="text-xl font-semibold text-pink-300 mb-2">
+                <h3 className="text-xl font-semibold text-indigo-300  mb-2">
                   {project.name}
                 </h3>
-                <p className="text-gray-400 mb-2">Status: {project.description}</p>
+                <p className="text-gray-400 mb-2">{project.description}</p>
 
                 <button
                   onClick={() => viewWorkspace(project)}

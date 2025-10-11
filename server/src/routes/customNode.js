@@ -1,7 +1,7 @@
 import {Router} from "express"
 import { NodeVM } from "vm2";
 import { PrismaClient } from "@prisma/client";
-import validateBody from "../middlewares/validateBody";
+import validateBody from "../middlewares/validateBody.js";
 
 const prisma = new PrismaClient();
 

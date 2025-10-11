@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { PrismaClient } from '@prisma/client';
 import validateBody from "../middlewares/validateBody.js";
-import { defaultWorkflow } from "../data/defaultWorkflow.js";
+import { defaultWorkflow } from "../utils/defaultWorkflow.js";
 
 const prisma = new PrismaClient();
 
