@@ -6,7 +6,6 @@ import ReactFlow, {
   Handle,
   Position,
   Controls,
-  MiniMap,
 } from 'reactflow';
 import type { Node, Edge, NodeChange, EdgeChange, Connection, ReactFlowInstance, XYPosition } from 'reactflow';
 import Cookies from 'js-cookie';
@@ -55,7 +54,7 @@ const initialNodes: Node<AIFlowNodeData>[] = [
 
 const initialEdges: Edge[] = [];
 
-export default function Flow() {
+export default function Flow({ type }: { type: string }) {
   const { id } = useGlobalContext();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [isValid, setIsValid] = useState<boolean>(true)
@@ -93,7 +92,7 @@ export default function Flow() {
       },
     }));
 
-    const flow = { nodes: serializableNodes, edges, id, workspaceId };
+    const flow = { nodes: serializableNodes, edges, id, workspaceId, type };
     const compressed = LZString.compressToBase64(JSON.stringify(flow));
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
@@ -324,16 +323,18 @@ export default function Flow() {
 
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/get-workflow`, {workspaceId: Number(workspaceId)})
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/${type == "personal" ? "get-workflow" : "get-team-workflow"}`, type == "personal" ? {workspaceId: Number(workspaceId)} : {teamId: Number(workspaceId)})
       .then(res => {
         const flow = loadFlowFromCookie();
-        if (flow.id === id && flow.workspaceId == workspaceId && flow.nodes.length > 0) {
-          setNodes(flow.nodes);
-          setEdges(flow.edges);
-          toast.success('Previous session flow loaded');
-        } else {
-          setNodes(res.data.workflow.nodes);
-          setEdges(res.data.workflow.edges);
+        if (flow.nodes.length > 0) {
+          if (flow.id === id && flow.workspaceId == workspaceId && flow.type === type) {
+            setNodes(flow.nodes);
+            setEdges(flow.edges);
+            toast.success('Previous session flow loaded');
+          } else {
+            setNodes(res.data.workflow.nodes);
+            setEdges(res.data.workflow.edges);
+          }
         }
       })
       .catch(err => {

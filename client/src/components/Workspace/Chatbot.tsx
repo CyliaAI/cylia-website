@@ -1,6 +1,7 @@
 import { useGlobalContext } from "@/context/GlobalContext"
-import { Mic, Plus, Send, Paperclip, Image, FileText, X } from "lucide-react"
+import { Mic, Plus, Send, Paperclip, Image, FileText } from "lucide-react"
 import { useState, useRef, useEffect, FormEvent, KeyboardEvent } from "react"
+import axios from "axios"
 
 type MessageType = 'user' | 'bot'
 
@@ -36,27 +37,18 @@ const Chatbot: React.FC = () => {
     scrollToBottom()
   }, [messages, isTyping])
 
-  const generateBotResponse = (userMessage: string) => {
-    const lowerMessage = userMessage.toLowerCase()
-
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-      return 'Hello! How can I assist you today?'
-    } else if (lowerMessage.includes('email')) {
-      return 'I can help you create an email. Could you provide more details about what you\'d like to include in the email?'
-    } else if (lowerMessage.includes('pdf') || lowerMessage.includes('summarize')) {
-      return 'I\'d be happy to help summarize a PDF document. Please upload the PDF file and I\'ll create a comprehensive summary for you.'
-    } else if (lowerMessage.includes('help')) {
-      return 'I can help you with:\n• Creating emails and documents\n• Summarizing content\n• Answering questions\n• General assistance\n\nWhat would you like to do?'
-    } else if (lowerMessage.includes('thank')) {
-      return 'You\'re welcome! Is there anything else I can help you with?'
-    } else {
-      return 'I understand. Could you provide more details so I can assist you better?'
-    }
+  const fetchBotResponse = async (userMessage: string) => {
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/chatbot/chat`, { model:"gemini-2.5-flash", text: userMessage })
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.error(err);
+    })
   }
 
-  const handleSubmit = (e?: FormEvent<HTMLFormElement | HTMLDivElement>) => {
+  const handleSubmit = async (e?: FormEvent<HTMLFormElement | HTMLDivElement>) => {
     e?.preventDefault()
-    
     if (!inputValue.trim()) return
 
     const userMessage: Message = {
@@ -67,20 +59,21 @@ const Chatbot: React.FC = () => {
     }
 
     setMessages(prev => [...prev, userMessage])
+    const currentInput = inputValue
     setInputValue('')
     setIsTyping(true)
 
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: messages.length + 2,
-        type: 'bot',
-        content: generateBotResponse(inputValue),
-        timestamp: new Date()
-      }
+    const botReply = await fetchBotResponse(currentInput)
 
-      setMessages(prev => [...prev, botResponse])
-      setIsTyping(false)
-    }, 1000 + Math.random() * 1000)
+    const botMessage: Message = {
+      id: Date.now(),
+      type: 'bot',
+      content: botReply,
+      timestamp: new Date()
+    }
+
+    setMessages(prev => [...prev, botMessage])
+    setIsTyping(false)
   }
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -99,7 +92,7 @@ const Chatbot: React.FC = () => {
     }
 
     const botMessage: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       type: 'bot',
       content: `File upload feature coming soon! You'll be able to upload ${fileTypes[type] || 'files'} here.`,
       timestamp: new Date()
@@ -110,12 +103,11 @@ const Chatbot: React.FC = () => {
 
   const handleVoiceInput = () => {
     const botMessage: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       type: 'bot',
       content: 'Voice input feature is currently in development. Stay tuned!',
       timestamp: new Date()
     }
-
     setMessages(prev => [...prev, botMessage])
   }
 
@@ -188,7 +180,7 @@ const Chatbot: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thumb-emerald-500 scrollbar-thin scrollbar-track-transparent scrollbar-rounded">
+        <div className="flex-1 overflow-y-auto space-y-4 pr-4 pt-6 scrollbar-thumb-emerald-500 scrollbar-thin scrollbar-track-transparent scrollbar-rounded">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -196,7 +188,7 @@ const Chatbot: React.FC = () => {
             >
               <div className={`rounded-full flex items-center text-white justify-center flex-shrink-0 ${
                 message.type === 'bot' 
-                  ? 'bg-gradient-to-br from-blue-500 to-purple-600' 
+                  ? 'bg-gradient-to-br from-blue-500 to-purple-600 w-8 h-8' 
                   : 'bg-gradient-to-br w-8 h-8 from-green-500 to-emerald-600'
               }`}>
                 {message.type === 'bot' ? <></> : <p>{name ? name[0] : "N"}</p>}

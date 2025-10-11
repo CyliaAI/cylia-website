@@ -10,6 +10,8 @@ router.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Model and text are required" });
     }
 
+    console.log(model, text);
+
     const result = await chatbot(model, text);
     res.json({ result });
   } catch (error) {
