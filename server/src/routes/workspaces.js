@@ -55,7 +55,7 @@ router.post('/get', validateBody([
             select: {
                 team: {
                     select: {
-                        id: true,
+                        workspaceId: true,
                         name: true,
                         description: true,
                         members: true,
