@@ -17,7 +17,7 @@ model User {
   workspaces PersonalWorkspace[]
   teams   TeamMember[]
 
-  ownedTeams  Team[]
+  ownedTeams Team[]
 }
 
 model PersonalWorkspace {

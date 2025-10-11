@@ -67,7 +67,7 @@ export default function Flow() {
   const onConnect = (connection: Connection) => setEdges(eds => addEdge(connection, eds));
 
   const [uploaded, setUploaded] = useState(false)
-  const [file, setFile] = useState();
+  const [exportPop, setExportPop] = useState<boolean>(false);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, label: string, type: string) => {
     const data = JSON.stringify({ label, type });
@@ -184,11 +184,6 @@ export default function Flow() {
   const nodeTypeMap: Record<string, NodeType> = {};
   nodeTypesList.forEach((n) => { nodeTypeMap[n.label] = n; });
 
-  const handleExport = () => {
-    console.log("Flow Order:", flowOrder);
-    console.log("Node Inputs:", nodeInputsMap);
-  }
-
   const DefaultNode = ({ data }: { data: AIFlowNodeData }) => {
     const bgMap: Record<string, string> = {
       MID: 'bg-blue-400/15',
@@ -206,10 +201,6 @@ export default function Flow() {
               ...prev,
               [label]: [...(prev[label] || []), value],
             }));
-            if (data.label == "Document"){
-              setUploaded(true)
-              setFile(value)
-            }
           },
         })
       : component;
@@ -343,13 +334,18 @@ export default function Flow() {
 
   return (
     <Layout showFooter={false}>
+      {exportPop && (
+        <div className='min-h-screen w-full fixed bg-black/50 z-[100]'>
+
+        </div>
+      )}
       <PrivateRoute />
       <div className="bg-[#2B3340] font-poppins min-h-screen">
         <div className="text-center text-[#D7FFCC] font-semibold text-[40px] pt-6">Create Your Workflow</div>
         <div className="text-center text-[#D7FFCC] opacity-[0.6] text-[18px] pb-2">These are the commands AI will be given</div>
 
         <div className="flex justify-end px-4 py-2 gap-3">
-          <button onClick={handleExport} className="border-[#D7FFCC] text-[#D7FFCC] border px-3 py-1 rounded-full hover:bg-[#D7FFCC] hover:text-black transition-all duration-200">Export</button>
+          <button onClick={() => setExportPop(true)} className="border-[#D7FFCC] text-[#D7FFCC] cursor-pointer border px-3 py-1 rounded-full hover:bg-[#D7FFCC] hover:text-black transition-all duration-200">Export</button>
           <button className="text-[#D7FFCC] cursor-pointer"><Settings size={30} /></button>
         </div>
 
@@ -381,7 +377,6 @@ export default function Flow() {
               noDragClassName="nodrag"
             >
               <Controls />
-              <MiniMap />
             </ReactFlow>
           </div>
         </div>

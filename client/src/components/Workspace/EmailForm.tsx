@@ -7,15 +7,13 @@ interface EmailFormProps {
 
 export default function EmailForm({ nodeLabel, onValueChange }: EmailFormProps) {
   const [email, setEmail] = useState('');
-  const [emailFinale, setEmailFinale] = useState('');
   const [subject, setSubject] = useState('');
-  const [subjectFinale, setSubjectFinale] = useState('');
 
   useEffect(() => {
     if (nodeLabel && onValueChange) {
-      onValueChange(nodeLabel, [emailFinale, subjectFinale]);
+      onValueChange(nodeLabel, [email, subject]);
     }
-  }, [emailFinale, subjectFinale]);
+  }, [email, subject, nodeLabel, onValueChange]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -26,15 +24,15 @@ export default function EmailForm({ nodeLabel, onValueChange }: EmailFormProps) 
         type="text"
         placeholder="Email"
         value={email}
-        onBlur={e => setEmailFinale(e.target.value)}
         onChange={e => setEmail(e.target.value)}
+        className="text-[8px]"
       />
       <input
         type="text"
         placeholder="Subject"
         value={subject}
-        onBlur={e => setSubjectFinale(e.target.value)}
         onChange={e => setSubject(e.target.value)}
+        className="text-[8px]"
       />
     </div>
   );
