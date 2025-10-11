@@ -14,6 +14,8 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
     console.log(req.file)
     let { flow, data } = req.body;
 
+    console.log(req.file)
+
     flow = flow || '[]';
     data = data || '{}';
 

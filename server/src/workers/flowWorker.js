@@ -19,6 +19,13 @@ const FiletoText = async (ctx) => {
   return ctx;
 };
 
+const summarize = async (ctx) => {
+  const summary = await summarise(ctx.model, ctx.content);
+  ctx.content = summary;
+  return ctx;
+};
+
+const RAG = async (ctx) => {
 const RAG = async (ctx) => {
   const retrieved_text = await rag(ctx.model, ctx.content);
   ctx.content = retrieved_text;
