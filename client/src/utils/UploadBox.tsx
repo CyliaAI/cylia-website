@@ -28,7 +28,7 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ uploadUrl }) => {
   return (
     <div
       onClick={handleUpload}
-      className={`border-2 border-dashed rounded-2xl p-6 cursor-pointer flex flex-col items-center justify-center text-center transition
+      className={`border-2 border-dashed rounded-2xl p-6 cursor-pointer flex text-[5px] flex-col items-center justify-center text-center transition
         ${
           status === "uploading"
             ? "border-blue-400 text-blue-400 animate-pulse"
@@ -39,10 +39,10 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ uploadUrl }) => {
             : "border-gray-400 hover:border-blue-400 hover:text-blue-400"
         }`}
     >
-      {status === "uploading" && <p>⏳ Uploading...</p>}
-      {status === "success" && <p>✅ Uploaded: {fileName}</p>}
-      {status === "error" && <p>❌ Failed: {fileName}</p>}
-      {status === "idle" && <p>📤 Click here to upload a file</p>}
+      {status === "uploading" && <p>Uploading...</p>}
+      {status === "success" && <p>Uploaded: {fileName}</p>}
+      {status === "error" && <p>Failed: {fileName}</p>}
+      {status === "idle" && <p>Click here to upload a file</p>}
     </div>
   );
 };

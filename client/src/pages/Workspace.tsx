@@ -3,8 +3,6 @@ import ReactFlow, {
   addEdge,
   applyNodeChanges,
   applyEdgeChanges,
-  Controls,
-  MiniMap,
   Handle,
   Position,
 } from "reactflow";
@@ -19,16 +17,41 @@ import type {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import Layout from "../components/Layout/Layout";
+import Dropdown from "@/components/Workspace/Dropdown";
+import { UploadBox } from "@/utils/UploadBox";
 
 interface AIFlowNodeData {
   label: string;
   style?: React.CSSProperties;
+  type?: string;
+  component?: React.ReactNode;
 }
 
-const nodeTypesList = [
-  { type: "llm", label: "LLM" },
-  { type: "vector", label: "Vector DB" },
-  { type: "extractor", label: "Document Extractor" },
+type NodeType = {
+  type: "BEGIN" | "MID" | "END";
+  label: string;
+  component: React.ReactElement;
+};
+
+const nodeTypesList: NodeType[] = [
+  { type: "MID", label: "LLM", component: (<Dropdown label="Select Model" options={["gpt-4", "gpt-3.5-turbo", "claude-3", "llama-2-13b", "mpt-7b", "falcon-40b"]}/>) },
+  { type: "MID", label: "Vector DB", component: (<Dropdown label="Select DB" options={["Faiss", "pgvector", "Pinecone", "Qdrant (Managed)",]}/>) },
+  { type: "MID", label: "Schedule", component: 
+    (<div className="flex flex-col gap-1">
+      <div className="text-[6px] text-gray-400 font-semibold">This will perform the operation at the scheduled time</div>
+      <input type="time" placeholder="Enter delay in seconds..." className="mt-1 px-3 py-1 text-[6px] w-fit border border-gray-300 rounded-sm"/>
+      <input type="date" placeholder="Enter scheduled time" className="mt-1 px-3 py-1 text-[6px] w-30 border border-gray-300 rounded-sm"/>
+    </div>)
+  },
+  { type: "END", label: "File to Text", component: (<div className="text-[6px] text-gray-400 font-semibold">Yea Sure Lol</div>) },
+  { type: "END", label: "RAG", component: (<div className="text-[6px] text-gray-400 font-semibold">This will retrieve relevant info from the specified vectorDB</div>) },
+  { type: "END", label: "Send Email", component: 
+  (<div className="flex flex-col gap-1">
+    <div className="text-[6px] text-gray-400 font-semibold">This will send an email to the specified address</div>
+    <input type="text" placeholder="Enter email address" className="mt-1 px-3 py-1 text-[6px] w-fit border border-gray-300 rounded-sm"/>
+    <input type="text" placeholder="Enter Subject" className="mt-1 px-3 py-1 text-[6px] w-30 border border-gray-300 rounded-sm"/>
+  </div>) },
+  { type: "BEGIN", label: "Document Extractor", component: (<UploadBox uploadUrl={`${import.meta.env.BACKEND_URL}/upload`} />) },
 ];
 
 const initialNodes: Node<AIFlowNodeData>[] = [
@@ -41,22 +64,28 @@ const initialEdges: Edge[] = [];
 const DefaultNode = ({ data }: { data: AIFlowNodeData }) => {
 
   const bgMap: Record<string, string> = {
-      "LLM": "bg-blue-400/15",
-      "Vector DB": "bg-red-400/15",
-      "Document Extractor": "bg-green-400/15",
+      "MID": "bg-blue-400/15",
+      "END": "bg-red-400/15",
+      "BEGIN": "bg-green-400/15",
   }
+
+  console.log("Component type:", data.component);
+
   
   return (
-    <div style={{ position: "relative", ...data.style }} className={`${bgMap[data.label]} backdrop-blur-[1px] font-poppins`}>
-      <Handle type="target" position={Position.Left} />
-      <div className="text-[8px]">{data.label}</div>
-      <Handle type="source" position={Position.Right} />
+    <div style={{ position: "relative", ...data.style }} className={`${bgMap[data.type]} ${data.label == "Start" || data.label == "Output" ? "w-full" : "w-fit"} backdrop-blur-[1px] font-poppins`}>
+      {data.label !== "Start" && <Handle type="target" position={Position.Left} />}
+      <div className="text-[8px] mb-2">{data.label}</div>
+      <div>
+        {React.isValidElement(data.component) ? data.component : null}
+      </div>
+      {data.label !== "Output" && <Handle type="source" position={Position.Right} />}
     </div>
   );
 }
 
 const styleMap: Record<string, React.CSSProperties> = {
-      LLM: {
+      "MID": {
         color: "#fff",
         borderWidth: "7px 1px 1px 1px",
         borderStyle: "solid",
@@ -67,7 +96,7 @@ const styleMap: Record<string, React.CSSProperties> = {
         boxShadow: "2px 2px 10px rgba(0,0,0,0.3)",
         textAlign: "center",
       },
-      "Vector DB": {
+      "END": {
         color: "#fff",
         borderWidth: "7px 1px 1px 1px",
         borderStyle: "solid",
@@ -78,7 +107,7 @@ const styleMap: Record<string, React.CSSProperties> = {
         boxShadow: "inset 0 0 5px rgba(0,0,0,0.2)",
         textAlign: "center",
       },
-      "Document Extractor": {
+      "BEGIN": {
         color: "#fff",
         borderWidth: "7px 1px 1px 1px",
         borderStyle: "solid",
@@ -96,6 +125,7 @@ const styleMap: Record<string, React.CSSProperties> = {
         borderStyle: "solid",
         borderColor: "#06b6d4",
         borderRadius: 5,
+        padding: "12px 16px",
         width: 60,
         height: 60,
         display: "flex",
@@ -103,6 +133,7 @@ const styleMap: Record<string, React.CSSProperties> = {
         alignItems: "center",
         fontWeight: "bold",
         boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+        textAlign: "center",
       },
       Output: {
         color: "#ffffff",
@@ -125,9 +156,7 @@ export default function Flow() {
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
-  const nodeTypes = {
-    default: DefaultNode,
-  };
+  const nodeTypes = useMemo(() => ({ default: DefaultNode }), []);
 
   const onNodesChange = (changes: NodeChange[]) =>
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -138,8 +167,9 @@ export default function Flow() {
   const onConnect = (connection: Connection) =>
     setEdges((eds) => addEdge(connection, eds));
 
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, label: string) => {
-    event.dataTransfer.setData("application/reactflow", label);
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>, label: string, type: string) => {
+    const data = JSON.stringify({ label, type });
+    event.dataTransfer.setData("application/reactflow", data);
     event.dataTransfer.effectAllowed = "move";
   };
 
@@ -147,8 +177,14 @@ export default function Flow() {
     event.preventDefault();
     if (!reactFlowWrapper.current || !reactFlowInstance) return;
 
-    const label = event.dataTransfer.getData("application/reactflow");
-    if (!label) return;
+    const reactFlowData = event.dataTransfer.getData("application/reactflow");
+    if (!reactFlowData) return;
+
+    const { type, label } = JSON.parse(reactFlowData);
+    if (!type || !label) return;
+
+    const nodeTypeItem = nodeTypesList.find((n) => n.label === label && n.type === type);
+    if (!nodeTypeItem) return;
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const position: XYPosition = reactFlowInstance.project({
@@ -160,19 +196,14 @@ export default function Flow() {
       id: (nodes.length + 1).toString(),
       type: "default",
       position,
-      data: { label,
-      style: styleMap[label] || {
-        background: "#fff",
-        color: "#000",
-        border: "1px solid #555",
-        padding: 10,
-      }},
-      style: {
-        background: "transparent",
-        border: "0px",
-      }
+      data: {
+        label,
+        type,
+        style: styleMap[type],
+        component: nodeTypeItem.component,
+      },
+      style: { background: "transparent", border: "0px" },
     };
-
 
     setNodes((nds) => nds.concat(newNode));
   };
@@ -181,7 +212,7 @@ export default function Flow() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Delete" || event.key === "Backspace") {
+      if (event.key === "Delete") {
         setNodes((nds) => nds.filter((n) => !n.selected));
         setEdges((eds) => eds.filter((e) => !e.selected));
       }
@@ -201,10 +232,10 @@ export default function Flow() {
           <h3 className="font-bold mb-2 text-[#9DD4B2]">Workflows</h3>
           <div className="flex flex-col gap-2">
             {nodeTypesList.map((node) => (
-              <div key={node.type}
+              <div key={node.label}
               draggable
-              onDragStart={(e) => onDragStart(e, node.label)}
-              style={{ position: "relative", ...styleMap[node.label] }} 
+              onDragStart={(e) => onDragStart(e, node.label, node.type)}
+              style={{ position: "relative", ...styleMap[node.type] }} 
               className={`backdrop-blur-[1px] font-poppins cursor-pointer`}>
                 <div className="text-[8px]">{node.label}</div>
               </div>
@@ -227,9 +258,8 @@ export default function Flow() {
             bg-[url('/bg.svg')] 
             bg-center bg-[length:40%]"
             nodeTypes={nodeTypes}
+            noDragClassName="nodrag"
           >
-            <MiniMap />
-            <Controls />
           </ReactFlow>
         </div>
       </div>
