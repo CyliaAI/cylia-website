@@ -6,9 +6,11 @@ import validateBody from "../middlewares/validateBody.js";
 
 const router = express.Router();
 
-router.post("/run-flow", uploadFiles(1).single('file'), async (req, res) => {
+router.post("/run-flow", uploadFiles().single('file'), validateBody([
+  { key: 'flow', type: 'string', required: true },
+  { key: 'data', type: 'string', required: true }
+]), async (req, res) => {
   try {
-    console.log(req.file)
     let { flow, data } = req.body;
 
     flow = flow || '[]';

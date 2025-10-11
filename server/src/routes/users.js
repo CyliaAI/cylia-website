@@ -6,7 +6,9 @@ const prisma = new PrismaClient();
 
 const router = Router();
 
-router.post("/find", async(req, res) => {
+router.post("/find", validateBody([
+    { key: 'search', type: 'string', required: true }
+]), async(req, res) => {
     try {
         const { search } = req.body;
         const users = await prisma.user.findMany({

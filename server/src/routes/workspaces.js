@@ -34,7 +34,9 @@ router.post('/create-team', validateBody([
     }
 });
 
-router.post('/get', async (req, res) => {
+router.post('/get', validateBody([
+    { key: 'userId', type: 'number', required: true }
+]), async (req, res) => {
     try {
         const { userId } = req.body;
         if (!userId) return res.status(400).json({ message: "No User Found"});
@@ -55,6 +57,7 @@ router.post('/get', async (req, res) => {
                         name: true,
                         description: true,
                         members: true,
+                        workspace: true,
                     }
                 }
             }  
@@ -63,6 +66,59 @@ router.post('/get', async (req, res) => {
     } catch(err) {
         console.error("Server Error: ", err);
         res.status(500).json({ error: 'Failed to get Workspaces' + err})
+    }
+});
+
+router.post('/add-team-member', validateBody([
+    { key: 'teamId', type: 'number', required: true },
+    { key: 'userId', type: 'number', required: true },
+]), async(req, res) => {
+    try {
+        const { teamId, userId } = req.body;
+        const teamMember = await prisma.teamMember.create({
+            data: {
+                teamId,
+                userId
+            }
+        });
+        return res.status(200).json({ message: "Member added successfully", teamMember });
+    } catch(err) {
+        console.error("Server Error: ", err);
+        return res.status(500).json({ error: 'Failed to add member' + err})
+    }
+});
+
+router.post('/save-workflow', validateBody([
+    { key: 'workspaceId', type: 'number', required: true },
+    { key: 'workflow', type: 'object', required: true },
+]), async(req, res) => {
+    try {
+        const { workspaceId, nodes, edges } = req.body;
+        const workspace = await prisma.personalWorkspace.update({
+            where: { id: workspaceId },
+            data: { workflow }
+        });
+        return res.status(200).json({ message: "Workflow saved successfully", workspace });
+    } catch(err) {
+        console.error("Server Error: ", err);
+        return res.status(500).json({ error: 'Failed to save workflow' + err})
+    }
+})
+
+router.post('/save-team-workflow', validateBody([
+    { key: 'teamId', type: 'number', required: true },
+    { key: 'workflow', type: 'object', required: true },
+]), async(req, res) => {
+    try {
+        const { teamId, nodes, edges } = req.body;
+        const workspace = await prisma.team.update({
+            where: { id: teamId },
+            data: { workflow }
+        });
+        return res.status(200).json({ message: "Workflow saved successfully", workspace });
+    } catch(err) {
+        console.error("Server Error: ", err);
+        return res.status(500).json({ error: 'Failed to save workflow' + err})
     }
 })
 

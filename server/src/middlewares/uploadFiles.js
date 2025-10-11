@@ -8,6 +8,10 @@ const defaultStorage = multer.diskStorage({
     if (!fs.existsSync('uploads/')) fs.mkdirSync('uploads/');
     cb(null, 'uploads/');
   },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
 // Upload Files Middleware
