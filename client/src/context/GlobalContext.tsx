@@ -1,24 +1,30 @@
-import type React from "react"
-import { createContext, useContext } from "react"
+import type React from "react";
+import { createContext, useContext } from "react";
 
-export type User = object | undefined
-
-type GlobalContextType = {
-	userToken: string
-	setUserToken: React.Dispatch<React.SetStateAction<string>>
-	auth: boolean
-	setAuth: React.Dispatch<React.SetStateAction<boolean>>
-}
+export type GlobalContextType = {
+  isLoggedIn: boolean | null;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean | null>>;
+  id: number | null;
+  setId: React.Dispatch<React.SetStateAction<number | null>>;
+  email: string | null;
+  setEmail: React.Dispatch<React.SetStateAction<string | null>>;
+  name: string | null;
+  setName: React.Dispatch<React.SetStateAction<string | null>>;
+};
 
 const GlobalContextState: GlobalContextType = {
-	userToken: "",
-	setUserToken: () => {},
-	auth: false,
-	setAuth: () => {},
-}
-export const GlobalContext =
-	createContext<GlobalContextType>(GlobalContextState)
+  isLoggedIn: null,
+  setIsLoggedIn: () => {},
+  id: null,
+  setId: () => {},
+  email: null,
+  setEmail: () => {},
+  name: null,
+  setName: () => {},
+};
+
+export const GlobalContext = createContext<GlobalContextType>(GlobalContextState);
 
 export const useGlobalContext = () => {
-	return useContext(GlobalContext)
-}
+  return useContext(GlobalContext);
+};

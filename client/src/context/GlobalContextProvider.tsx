@@ -1,28 +1,47 @@
-import React, { useEffect } from "react"
-import { GlobalContext } from "./GlobalContext"
+import React, { useEffect, useState } from "react";
+import { GlobalContext } from "./GlobalContext";
+import type { GlobalContextType } from "./GlobalContext";
+import axios from "axios";
 
-type containerProps = {
-	children: React.ReactNode
-}
+type ContainerProps = {
+  children: React.ReactNode;
+};
 
-export const GlobalContextProvider: React.FC<containerProps> = ({
-	children,
-}) => {
-	const [userToken, setUserToken] = React.useState<string>("")
-	const [auth, setAuth] = React.useState<boolean>(false)
+export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [id, setId] = useState<number | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
 
-	useEffect(() => {
-		const userToken = localStorage.getItem("token")
-		if (userToken) {
-			setUserToken(userToken)
-			setAuth(true)
-		}
-	}, [])
+  useEffect(() => {
+    const verifyAuth = async () => {
+      try {
+        const resp = await axios.get("http://localhost:8000/auth/verify", {
+          withCredentials: true,
+        });
+        setIsLoggedIn(true);
+        setId(resp.data.user.id || null);
+        setEmail(resp.data.user.email || null);
+        setName(resp.data.user.name || null);
+      } 
+	  catch (err) {
+        console.error(err);
+        setIsLoggedIn(false);
+      }
+    };
+    verifyAuth();
+  }, []);
 
-	return (
-		<GlobalContext.Provider
-			value={{ userToken, setUserToken, auth, setAuth }}>
-			{children}
-		</GlobalContext.Provider>
-	)
-}
+  const contextValue: GlobalContextType = {
+    isLoggedIn,
+    setIsLoggedIn,
+    id,
+    setId,
+    email,
+    setEmail,
+    name,
+    setName,
+  };
+
+  return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
+};
