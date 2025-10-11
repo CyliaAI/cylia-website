@@ -20,7 +20,7 @@ import { Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
-import UploadBox from '@/utils/UploadBox';
+import UploadBox from '@/components/Workspace/UploadBox';
 import SchedulePicker from '@/components/Workspace/SchedulePicker';
 
 interface AIFlowNodeData {

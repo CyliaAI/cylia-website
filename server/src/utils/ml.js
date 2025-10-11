@@ -18,7 +18,7 @@ export const rag = async (model, text) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    return response.data.summary;
+    return response.data.result;
   } catch (error) {
     console.error("Error in RAG:", error);
   }
@@ -29,7 +29,7 @@ export const chatbot = async (model, text) => {
     const response = await axios.post(`${process.env.ML_SERVER}/api/chatbot`, { model_name: model, text }, {
       headers: { "Content-Type": "application/json" },
     });
-    return response.data.summary;
+    return response.data.reply;
   } catch (error) {
     console.error("Error Summarizing Text:", error);
   }
