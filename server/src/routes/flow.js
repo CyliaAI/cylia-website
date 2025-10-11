@@ -8,13 +8,30 @@ const router = express.Router();
 
 router.post("/run-flow", uploadFiles(1).single('file'), async (req, res) => {
   try {
+    console.log(req.file)
     let { flow, data } = req.body;
-    if (!flow || !data) {
-      return res.status(400).json({ error: "Flow and data are required" });
+
+    flow = flow || '[]';
+    data = data || '{}';
+
+    try {
+      flow = JSON.parse(flow);
+    } catch (err) {
+      return res.status(400).json({ error: "Invalid JSON in flow" });
     }
 
-    flow, data = JSON.parse(flow), JSON.parse(data);
-    data.file = req.file;
+    try {
+      data = JSON.parse(data);
+    } catch (err) {
+      return res.status(400).json({ error: "Invalid JSON in data" });
+    }
+
+    if (req.file) {
+      data.file = req.file;
+    } else {
+      data.file = null;
+    }
+
     if (!Array.isArray(flow)) {
       return res.status(400).json({ error: "Flow must be an array of steps" });
     }

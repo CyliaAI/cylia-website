@@ -14,10 +14,14 @@ import LZString from 'lz-string';
 import 'reactflow/dist/style.css';
 import Layout from '../components/Layout/Layout';
 import Dropdown from '@/components/Workspace/Dropdown';
-import { UploadBox } from '@/utils/UploadBox';
 import Chatbot from '@/components/Workspace/Chatbot';
 import { Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
+import SchedulePicker from '@/components/Workspace/SchedulePicker';
+import EmailForm from '@/components/Workspace/EmailForm';
+import UploadBox from '@/utils/UploadBox';
+import axios from 'axios';
+import { Form } from 'react-router-dom';
 
 interface AIFlowNodeData {
   label: string;
@@ -62,6 +66,9 @@ export default function Flow() {
   const onEdgesChange = (changes: EdgeChange[]) => setEdges(eds => applyEdgeChanges(changes, eds));
   const onConnect = (connection: Connection) => setEdges(eds => addEdge(connection, eds));
 
+  const [uploaded, setUploaded] = useState(false)
+  const [file, setFile] = useState();
+
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, label: string, type: string) => {
     const data = JSON.stringify({ label, type });
     event.dataTransfer.setData('application/reactflow', data);
@@ -69,10 +76,23 @@ export default function Flow() {
   };
 
   const saveFlowToCookie = (nodes: Node<AIFlowNodeData>[], edges: Edge[]) => {
-    const flow = { nodes, edges };
+    const serializableNodes = nodes.map(({ id, type, position, data, style }) => ({
+      id,
+      type,
+      position,
+      style,
+      data: {
+        label: data.label,
+        type: data.type,
+        style: data.style,
+      },
+    }));
+
+    const flow = { nodes: serializableNodes, edges };
     const compressed = LZString.compressToBase64(JSON.stringify(flow));
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
+
 
   const loadFlowFromCookie = () => {
     const compressed = Cookies.get('myFlow');
@@ -131,25 +151,17 @@ export default function Flow() {
     },
     {
       type: 'MID',
-      label: 'Vector DB',
+      label: 'VectorDB',
       component: <Dropdown label="Select DB" options={['Faiss', 'pgvector', 'Pinecone', 'Qdrant (Managed)']} />,
     },
     {
       type: 'MID',
       label: 'Schedule',
-      component: (
-        <div className="flex flex-col gap-1">
-          <div className="text-[6px] text-gray-400 font-semibold">
-            This will perform the operation at the scheduled time
-          </div>
-          <input type="time"  />
-          <input type="date"  />
-        </div>
-      ),
+      component: <SchedulePicker />,
     },
     {
       type: 'END',
-      label: 'File to Text',
+      label: 'FiletoText',
       component: <div className="text-[6px] text-gray-400 font-semibold">Yea Sure Lol</div>,
     },
     {
@@ -159,24 +171,23 @@ export default function Flow() {
     },
     {
       type: 'END',
-      label: 'Send Email',
-      component: (
-        <div className="flex flex-col gap-1">
-          <div className="text-[6px] text-gray-400 font-semibold">This will send an email to the specified address</div>
-          <input type="text" placeholder="Email"  />
-          <input type="text" placeholder="Subject" />
-        </div>
-      ),
+      label: 'SendEmail',
+      component: <EmailForm />,
     },
     {
       type: 'BEGIN',
-      label: 'Document Extractor',
-      component: <UploadBox />,
+      label: 'Document',
+      component: <UploadBox  />,
     },
   ];
 
   const nodeTypeMap: Record<string, NodeType> = {};
   nodeTypesList.forEach((n) => { nodeTypeMap[n.label] = n; });
+
+  const handleExport = () => {
+    console.log("Flow Order:", flowOrder);
+    console.log("Node Inputs:", nodeInputsMap);
+  }
 
   const DefaultNode = ({ data }: { data: AIFlowNodeData }) => {
     const bgMap: Record<string, string> = {
@@ -195,6 +206,10 @@ export default function Flow() {
               ...prev,
               [label]: [...(prev[label] || []), value],
             }));
+            if (data.label == "Document"){
+              setUploaded(true)
+              setFile(value)
+            }
           },
         })
       : component;
@@ -209,16 +224,10 @@ export default function Flow() {
         {data.label !== 'Start' && <Handle type="target" position={Position.Left} />}
         <div className="text-[8px] mb-2">{data.label}</div>
         <div>{renderedComponent}</div>
-        {data.label === 'Output' && (
-          <button className="border-blue-950 text-blue-900 border px-3 py-1 text-[6px] rounded-md hover:bg-[#002e57]/20 hover:text-black transition-all duration-200 cursor-pointer">
-            Submit
-          </button>
-        )}
         {data.label !== 'Output' && <Handle type="source" position={Position.Right} />}
       </div>
     );
   };
-
 
   const nodeTypes = useMemo(() => ({ default: DefaultNode }), []);
 
@@ -261,10 +270,27 @@ export default function Flow() {
     return orderWithLabels;
   }
 
-  const handleExport = () => {
+  const handleSubmit = () => {
     console.log("Flow Order:", flowOrder);
     console.log("Node Inputs:", nodeInputsMap);
-    toast.success("Flow order and inputs logged to console");
+    const formData = new FormData();
+    if (uploaded) {
+      const allFiles = (nodeInputsMap.Document || []).filter(f => f instanceof File);
+      formData.append('file', allFiles[0])
+    }
+    formData.append('flow', JSON.stringify(flowOrder));
+    formData.append('data', JSON.stringify(nodeInputsMap))
+
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/task/run-flow`, formData, {
+      headers: {"Content-Type": "multipart/form-data"}
+    })
+    .then(response => {
+      console.log('Flow submitted successfully:', response.data);
+    })
+    .catch(error => {
+      console.error('Error submitting flow:', error);
+    });
+    toast.success("Flow submitted! Check console for details.");
   };
 
   useEffect(() => {
@@ -272,9 +298,6 @@ export default function Flow() {
     setFlowOrder(order);
   }, [nodes, edges]);
 
-  useEffect(() => {
-    console.log("Current flow order:", flowOrder);
-  }, [flowOrder]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -305,6 +328,12 @@ export default function Flow() {
 
 
   useEffect(() => {
+    const flow = loadFlowFromCookie();
+    if (flow.nodes.length > 0) {
+      setNodes(flow.nodes);
+      setEdges(flow.edges);
+      toast.success('Previous session flow loaded');
+    }
   }, []);
 
   useEffect(() => {
@@ -324,7 +353,6 @@ export default function Flow() {
         </div>
 
         <div className="flex h-screen">
-          {/* Sidebar */}
           <div className="w-52 p-2 border-r border-gray-700 bg-gray-900">
             <h3 className="font-bold mb-2 text-[#9DD4B2]">Workflows</h3>
             <div className="flex flex-col gap-2">
@@ -356,7 +384,9 @@ export default function Flow() {
             </ReactFlow>
           </div>
         </div>
-
+        <button onClick={handleSubmit} className="border-blue-950 bg-blue-600 font-semibold text-white border px-3 py-1 text-xl rounded-md hover:bg-blue-500 transition-all duration-200 cursor-pointer">
+            Submit
+        </button>
         <Chatbot />
       </div>
     </Layout>

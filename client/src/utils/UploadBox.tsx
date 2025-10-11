@@ -1,48 +1,46 @@
-//it it the sample upload box component with tailwind css 
-//upload url should be passed as prop
-//example usage of this component in frontend <UploadBox uploadUrl="http://localhost:8000/upload" />
-import React, { useState } from "react";
-import { selectAndUploadFile } from "./FileUpload";
+import { useState, useEffect } from "react";
 
 interface UploadBoxProps {
-  uploadUrl: string;
+  nodeLabel?: string;
+  onValueChange?: (label: string, value: File | null) => void;
 }
 
-export const UploadBox: React.FC<UploadBoxProps> = ({ uploadUrl }) => {
-  const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
-  const [fileName, setFileName] = useState<string | null>(null);
+export default function UploadBox({ nodeLabel, onValueChange }: UploadBoxProps) {
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleUpload = async () => {
-    setStatus("uploading");
-    const result = await selectAndUploadFile(uploadUrl);
-
-    if (result.success) {
-      setStatus("success");
-      setFileName(result.fileName || null);
-    } else {
-      setStatus("error");
-      setFileName(result.error || null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setFile(null);
+      return;
     }
+    setFile(e.target.files[0]);
   };
 
+  useEffect(() => {
+    if (nodeLabel && onValueChange) {
+      onValueChange(nodeLabel, file);
+    }
+  }, [file]);
+
   return (
-    <div
-      onClick={handleUpload}
-      className={`border-2 border-dashed rounded-2xl p-6 cursor-pointer flex text-[5px] flex-col items-center justify-center text-center transition
-        ${
-          status === "uploading"
-            ? "border-blue-400 text-blue-400 animate-pulse"
-            : status === "success"
-            ? "border-green-500 text-green-500"
-            : status === "error"
-            ? "border-red-500 text-red-500"
-            : "border-gray-400 hover:border-blue-400 hover:text-blue-400"
-        }`}
-    >
-      {status === "uploading" && <p>Uploading...</p>}
-      {status === "success" && <p>Uploaded: {fileName}</p>}
-      {status === "error" && <p>Failed: {fileName}</p>}
-      {status === "idle" && <p>Click here to upload a file</p>}
+    <div className="flex flex-col gap-2 text-[6px] text-gray-400">
+      <label
+        htmlFor={`upload-${nodeLabel}`}
+        className="cursor-pointer px-3 py-1 bg-white/90 backdrop-blur-md border border-gray-300 rounded-sm shadow-sm text-gray-700 hover:bg-cyan-100 hover:text-cyan-700 transition-all duration-200"
+      >
+        {file ? file.name : "Upload File"}
+      </label>
+      <input
+        id={`upload-${nodeLabel}`}
+        type="file"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      {file && (
+        <div className="text-[5px] pl-2">
+          {file.name} ({Math.round(file.size / 1024)} KB)
+        </div>
+      )}
     </div>
   );
-};
+}

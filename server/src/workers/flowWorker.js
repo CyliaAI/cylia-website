@@ -6,57 +6,71 @@ import { uploadFiles } from "../middlewares/uploadFiles.js";
 import { summarise, rag } from "../utils/ml.js";
 
 // Define Tasks which are asynchronous
-const uploadPDF = async (ctx) => {
+const Document = async (ctx) => {
   // No Functionality as of now
   return ctx;
 };
 
-const ocr = async (ctx) => {
+const FiletoText = async (ctx) => {
+  console.log(ctx)
   await extractTextFromFile(ctx.file).then((text) => {
     ctx.content = text;
   });
   return ctx;
 };
 
-const summarize = async (ctx) => {
-  const summary = await summarise(ctx.model, ctx.content);
-  ctx.content = summary;
-  return ctx;
-};
-
-const ragFn = async (ctx) => {
+const RAG = async (ctx) => {
   const retrieved_text = await rag(ctx.model, ctx.content);
   ctx.content = retrieved_text;
   return ctx;
 }
 
-const sendEmail = async (ctx) => {
+const SendEmail = async (ctx) => {
     await sendMail(ctx.email, "Automated Email from Cylia", ctx.content)
     return ctx;
 }
+
+const Start = async (ctx) => {
+  console.log("Started")
+}
+
+const Output = async (ctx) => {
+  console.log("Output");
+}
+
+const Schedule = async (ctx) => {
+  console.log("Scheduled");
+} 
+
+const LLM = async (ctx) => {
+  const summary = await summarise(ctx.model, ctx.content);
+  ctx.content = summary;
+  return ctx;
+}
 // Map of Task Names
 const taskMap = {
-  uploadPDF,
-  ocr,
-  ragFn,
-  summarize,
-  sendEmail,
+  Document,
+  FiletoText,
+  RAG,
+  LLM,
+  SendEmail,
+  Start,
+  Output,
 };
 
 // --- Create a worker ---
 const worker = new Worker(
-  flowQueue.name, // Queue Name
+  flowQueue.name,
   async (job) => {
     console.log("Processing job:", job.id);
 
     const { flow, data } = job.data;
     let context = { ...data };
-
+    console.log(context)
     for (const step of flow) {
       const fn = taskMap[step];
       if (!fn) throw new Error(`Unknown task: ${step}`);
 
-      console.log(`Running step: ${step}`);
       context = await fn(context);
     }
 
