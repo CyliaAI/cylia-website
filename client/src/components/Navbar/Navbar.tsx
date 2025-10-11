@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useGlobalContext } from "@/context/GlobalContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   account: { name: string };
@@ -7,8 +9,23 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = () => {
+  const navigate = useNavigate();
   const [ dropdown, setDropdown ] = useState(false);
   const { name } = useGlobalContext();
+
+  const logout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`,{},{withCredentials:true});
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const viewspace = ()=>{
+    navigate('/workspace')
+  }
+
   return (
     <nav
       className={`fixed w-full px-10 py-4 z-50 transition-all duration-300`}
@@ -32,7 +49,18 @@ const Navbar: React.FC<NavbarProps> = () => {
           </div>
         </div>
       </div>
+      {dropdown && (
+          <div className="absolute right-10 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700 z-50">
+            <ul className="flex flex-col">
+              <li onClick={viewspace} className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm">View Workspace</li>
+              <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm">Notifications</li>
+              <li onClick={logout} className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-red-500 text-sm">Logout</li>
+            </ul>
+          </div>
+      )}
+
     </nav>
+    
   );
 };
 
