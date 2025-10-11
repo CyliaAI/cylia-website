@@ -142,6 +142,22 @@ router.post('/save-team-workflow', validateBody([
         console.error("Server Error: ", err);
         return res.status(500).json({ error: 'Failed to save workflow' + err})
     }
-})
+});
+
+router.post('/get-workflow', validateBody([
+    { key: 'workspaceId', type: 'number', required: true },
+]), async(req, res) => {
+    try {
+        const { workspaceId } = req.body;
+        const workspace = await prisma.personalWorkspace.findUnique({
+            where: { id: workspaceId },
+            select: { workflow: true }
+        });
+        return res.status(200).json({ workflow: workspace.workflow });
+    } catch(err) {
+        console.error("Server Error: ", err);
+        return res.status(500).json({ error: 'Failed to get workflow' + err})
+    }
+});
 
 export default router;
