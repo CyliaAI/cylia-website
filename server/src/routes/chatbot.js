@@ -1,4 +1,4 @@
-import { chatbot } from "../utils/ml.js";
+import { chatbot, summarise } from "../utils/ml.js";
 import { Router } from "express";
 
 const router = Router();
@@ -9,10 +9,7 @@ router.post("/chat", async (req, res) => {
     if (!model || !text) {
       return res.status(400).json({ error: "Model and text are required" });
     }
-
-    console.log(model, text);
-
-    const result = await chatbot(model, text);
+    const result = await summarise(model, text);
     res.json({ result });
   } catch (error) {
     console.error("Error in /chat:", error);
