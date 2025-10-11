@@ -21,7 +21,6 @@ router.post('/create-team', validateBody([
                 workflow: { nodes: [], edges: [] }
             }
         });
-        //No description in schema
         const teamWithUser = await prisma.teamMember.create({
             data: {
                 teamId: team.id,

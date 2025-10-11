@@ -11,6 +11,7 @@ router.post("/find", validateBody([
 ]), async(req, res) => {
     try {
         const { search } = req.body;
+        console.log(search);
         const users = await prisma.user.findMany({
             where: {
                 email: {
@@ -20,7 +21,7 @@ router.post("/find", validateBody([
             },
             take: 10
         });
-
+        console.log(users);
         return res.status(200).json({ users });
     } catch(err) {
         console.error("Server Error: ", err);

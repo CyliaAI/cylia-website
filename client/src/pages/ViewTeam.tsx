@@ -1,53 +1,54 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
 import { GlobalContext } from "../context/GlobalContext";
-import { useContext } from "react";
-
 
 interface ViewteamProps {
   team: {
     name: string;
     description: string;
-    members: Array<unknown>;
+    members: Array<any>;
     workflow: unknown;
   };
   onClose: () => void;
 }
 
-export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
+export const ViewTeam: React.FC<ViewteamProps> = ({ team, onClose }) => {
   const [search, setSearch] = useState("");               
   const [debouncedSearch] = useDebounce(search, 500); 
-    
+  const teamId = team.members[0]?.teamId;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [userResult, setUserResult] = useState<any>(null); 
+  const [userResults, setUserResults] = useState<any>(null); 
   const {id} = useContext(GlobalContext);
-
 
   useEffect(() => {
     if (debouncedSearch.trim() === "") {
-      setUserResult(null);
+      setUserResults([]);
       return;
     }
 
-    const fetchUser = async () => {
+    const fetchUsers = async () => {
       try {
-        const res = await axios.post('http://localhost:8000/workspaces/get',{userId:id},{withCredentials:true});
-        setUserResult(res.data);
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/find`,{ search: debouncedSearch },{ withCredentials: true });
+        setUserResults(res.data.users || []);
       } catch (err) {
         console.error(err);
-        setUserResult(null);
+        setUserResults([]);
       }
     };
 
-    fetchUser();
+    fetchUsers();
   }, [id, debouncedSearch]);
 
-  const handleAddMember = () => {
-    if (!userResult) return;
-    alert(`Adding member: ${userResult.name} to team ${team.name}`);
+  const handleAddMember = async(user: any) => {
+    try{
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/add-team-member`,{teamId,userId:user.id},{withCredentials:true})
+    }
+    catch(err){
+
+    }
     setSearch("");
-    setUserResult(null);
+    setUserResults([]);
   };
 
   return (
@@ -61,7 +62,7 @@ export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
         <h2 className="text-2xl font-bold text-indigo-300 mb-2">{team.name}</h2>
         <p className="text-gray-400 mb-4">{team.description}</p>
         <p className="text-gray-300 font-medium mb-4">
-          Members: {team.members.length}
+          Members: {team.members.length || 0}
         </p>
 
         <div className="mb-4">
@@ -73,9 +74,32 @@ export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
             placeholder="Type user ID or name"
             className="w-full px-3 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          {userResult && (
-            <div className="mt-2 p-2 bg-gray-700 rounded text-gray-200">
-              {userResult.name} ({userResult.email})
+
+          {debouncedSearch && userResults.length === 0 && (
+            <div className="mt-2 text-gray-400 text-sm italic">
+              No users found
+            </div>
+          )}
+
+          {userResults && userResults.length > 0 && (
+            <div className="mt-2 bg-gray-700 rounded divide-y divide-gray-600 max-h-48 overflow-y-auto">
+              {userResults.map((user: any) => (
+                <div
+                  key={user.id}
+                  className="p-2 hover:bg-gray-600 cursor-pointer flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-gray-200">{user.name}</p>
+                    <p className="text-gray-400 text-sm">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => handleAddMember(user)}
+                    className="bg-indigo-500 cursor-pointer hover:bg-indigo-600 text-sm px-2 py-1 rounded"
+                  >
+                    Add
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -86,14 +110,6 @@ export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
             className="bg-gray-600 hover:bg-gray-700 text-white py-1 px-4 rounded"
           >
             Close
-          </button>
-
-          <button
-            onClick={handleAddMember}
-            disabled={!userResult}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add Member
           </button>
         </div>
       </div>

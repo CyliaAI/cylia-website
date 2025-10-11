@@ -10,6 +10,7 @@ import ReactFlow, {
 } from 'reactflow';
 import type { Node, Edge, NodeChange, EdgeChange, Connection, ReactFlowInstance, XYPosition } from 'reactflow';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 import LZString from 'lz-string';
 import 'reactflow/dist/style.css';
 import Layout from '../components/Layout/Layout';
@@ -18,6 +19,9 @@ import Chatbot from '@/components/Workspace/Chatbot';
 import { Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PrivateRoute from '@/router/PrivateRoutes';
+import EmailForm from '@/components/Workspace/EmailForm';
+import UploadBox from '@/utils/UploadBox';
+import SchedulePicker from '@/components/Workspace/SchedulePicker';
 
 interface AIFlowNodeData {
   label: string;

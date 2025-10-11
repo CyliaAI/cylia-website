@@ -21,7 +21,7 @@ export const publicRoutes: RouteObject[] = [
         errorElement: <NotFound />,
     },
 	{
-		path:"/workspace",
+		path:"/workspace/:id",
 		element:<Workspace />,
 		errorElement:<NotFound />
 	},
