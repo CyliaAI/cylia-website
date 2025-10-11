@@ -12,16 +12,31 @@ const Document = async (ctx) => {
 };
 
 const FiletoText = async (ctx) => {
-  console.log(ctx)
-  await extractTextFromFile(ctx.file).then((text) => {
-    ctx.content = text;
-  });
+  if (ctx.isPdf) {
+    console.log(ctx.file)
+    for (let i = 0; i < ctx.file.length; i++) {
+      await extractTextFromFile(ctx.file[i]).then((text) => {
+        ctx.content += text;
+      });
+    }
+  }
+  else {
+    await extractTextFromFile(ctx.file).then((text) => {
+      ctx.content = text;
+    });
+  }
+
+  console.log("Content")
+  console.log(ctx.content)
+
   return ctx;
 };
 
 const summarize = async (ctx) => {
+  console.log("in summary")
   const summary = await summarise(ctx.model, ctx.content);
   ctx.content = summary;
+  console.log(ctx.content)
   return ctx;
 };
 
@@ -32,21 +47,28 @@ const RAG = async (ctx) => {
 }
 
 const SendEmail = async (ctx) => {
-    await sendMail(ctx.email, "Automated Email from Cylia", ctx.content)
-    return ctx;
+  console.log("in send mail")
+  console.log(ctx['SendEmail'][ctx['SendEmail'].length - 1])
+  const email = ctx['SendEmail'][ctx['SendEmail'].length - 1][0]
+  const subject = ctx['SendEmail'][ctx['SendEmail'].length - 1][1]
+  await sendMail(email, "Automated Email from Cylia", ctx.content)
+  return ctx;
 }
 
 const Start = async (ctx) => {
   console.log("Started")
+  return ctx
 }
 
 const Output = async (ctx) => {
   console.log("Output");
+  return ctx
 }
 
 const Schedule = async (ctx) => {
   console.log("Scheduled");
-} 
+  return ctx
+}
 
 const LLM = async (ctx) => {
   const summary = await summarise(ctx.model, ctx.content);
