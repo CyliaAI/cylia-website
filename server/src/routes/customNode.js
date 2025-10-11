@@ -1,37 +1,32 @@
 import {Router} from "express"
 import { NodeVM } from "vm2";
 import { PrismaClient } from "@prisma/client";
+import validateBody from "../middlewares/validateBody";
+
 const prisma = new PrismaClient();
+
 const router = Router();
-router.post("/save-code", async (req, res) => {
-  const { userId, codeName, code } = req.body;
 
-  // Validate input
-  if (!userId || !codeName || !code) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
+router.post("/save-code", validateBody([
+  { key: "userId", type: "number", required: true },
+  { key: "codeName", type: "string", required: true },
+  { key: "code", type: "string", required: true },
+]), async (req, res) => {
   try {
+    const { userId, codeName, code } = req.body;
     const parsedUserId = parseInt(userId);
 
-    // Find the user
+    // Find the User
     let user = await prisma.user.findUnique({
       where: { id: parsedUserId },
     });
 
-    // Create the user if not exists
+    // Create the User if not Exists
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: parsedUserId,        
-          email: `user${parsedUserId}@example.com`, 
-          name: `User${parsedUserId}`,
-          password: "defaultpassword", 
-        },
-      });
+      return res.status(400).json({ error: "User not found" });
     }
 
-    // Upsert custom code: create new or overwrite existing
+    // Upsert Custom Code
     const customCode = await prisma.customCode.upsert({
       where: {
         userId_codeName: {

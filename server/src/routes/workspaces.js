@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { PrismaClient } from '@prisma/client';
 import validateBody from "../middlewares/validateBody.js";
+import { defaultWorkflow } from "../data/defaultWorkflow.js";
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ router.post('/create-team', validateBody([
                 name,
                 description,
                 ownerId: userId,
-                workflow: { nodes: [], edges: [] }
+                workflow: defaultWorkflow
             }
         });
         const teamWithUser = await prisma.teamMember.create({
@@ -82,7 +83,7 @@ router.post('/create-personal-workspace', validateBody([
                 name,
                 description,
                 ownerId: userId,
-                workflow: { nodes: [], edges: [] }
+                workflow: defaultWorkflow
             }
         });
         res.status(201).json({ workspace });
@@ -151,6 +152,22 @@ router.post('/get-workflow', validateBody([
         const { workspaceId } = req.body;
         const workspace = await prisma.personalWorkspace.findUnique({
             where: { id: workspaceId },
+            select: { workflow: true }
+        });
+        return res.status(200).json({ workflow: workspace.workflow });
+    } catch(err) {
+        console.error("Server Error: ", err);
+        return res.status(500).json({ error: 'Failed to get workflow' + err})
+    }
+});
+
+router.post('get-team-workflow', validateBody([
+    { key: 'teamId', type: 'number', required: true },
+]), async(req, res) => {
+    try {
+        const { teamId } = req.body;
+        const workspace = await prisma.team.findUnique({
+            where: { id: teamId },
             select: { workflow: true }
         });
         return res.status(200).json({ workflow: workspace.workflow });

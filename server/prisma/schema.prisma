@@ -30,7 +30,7 @@ model PersonalWorkspace {
   
   owner     User      @relation(fields: [ownerId], references: [id])
   ownerId   Int
-  workflow  Json?
+  workflow  Json?     @default("{}")
 }
 
 model Team {
