@@ -5,7 +5,8 @@
     "moduleResolution": "node",
     "allowJs": true,
     "checkJs": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.js"],
   "exclude": ["dist"]

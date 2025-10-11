@@ -6,7 +6,6 @@ import ReactFlow, {
   Handle,
   Position,
   Controls,
-  MiniMap,
 } from 'reactflow';
 import type { Node, Edge, NodeChange, EdgeChange, Connection, ReactFlowInstance, XYPosition } from 'reactflow';
 import Cookies from 'js-cookie';
@@ -22,6 +21,8 @@ import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
 import UploadBox from '@/components/Workspace/UploadBox';
 import SchedulePicker from '@/components/Workspace/SchedulePicker';
+import { useGlobalContext } from '@/context/GlobalContext';
+import { Navigate, useParams } from 'react-router-dom';
 
 interface AIFlowNodeData {
   label: string;
@@ -53,7 +54,10 @@ const initialNodes: Node<AIFlowNodeData>[] = [
 
 const initialEdges: Edge[] = [];
 
-export default function Flow() {
+export default function Flow({ type }: { type: string }) {
+  const { id } = useGlobalContext();
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+  const [isValid, setIsValid] = useState<boolean>(true)
   const [nodes, setNodes] = useState<Node<AIFlowNodeData>[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const [nodeInputValues, setNodeInputValues] = useState<NodeInputValues>({});
@@ -88,7 +92,7 @@ export default function Flow() {
       },
     }));
 
-    const flow = { nodes: serializableNodes, edges };
+    const flow = { nodes: serializableNodes, edges, id, workspaceId, type };
     const compressed = LZString.compressToBase64(JSON.stringify(flow));
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
@@ -319,12 +323,24 @@ export default function Flow() {
 
 
   useEffect(() => {
-    const flow = loadFlowFromCookie();
-    if (flow.nodes.length > 0) {
-      setNodes(flow.nodes);
-      setEdges(flow.edges);
-      toast.success('Previous session flow loaded');
-    }
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/${type == "personal" ? "get-workflow" : "get-team-workflow"}`, type == "personal" ? {workspaceId: Number(workspaceId)} : {teamId: Number(workspaceId)})
+      .then(res => {
+        const flow = loadFlowFromCookie();
+        if (flow.nodes.length > 0) {
+          if (flow.id === id && flow.workspaceId == workspaceId && flow.type === type) {
+            setNodes(flow.nodes);
+            setEdges(flow.edges);
+            toast.success('Previous session flow loaded');
+          } else {
+            setNodes(res.data.workflow.nodes);
+            setEdges(res.data.workflow.edges);
+          }
+        }
+      })
+      .catch(err => {
+        setIsValid(false);
+        console.error(err);
+      })
   }, []);
 
   useEffect(() => {
@@ -334,6 +350,7 @@ export default function Flow() {
 
   return (
     <Layout showFooter={false}>
+      {!isValid && <Navigate to="/not-found"/>}
       {exportPop && (
         <div className='min-h-screen w-full fixed bg-black/50 z-[100]'>
 

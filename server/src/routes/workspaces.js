@@ -55,7 +55,7 @@ router.post('/get', validateBody([
             select: {
                 team: {
                     select: {
-                        id: true,
+                        workspaceId: true,
                         name: true,
                         description: true,
                         members: true,
@@ -88,7 +88,7 @@ router.post('/create-personal-workspace', validateBody([
         });
         res.status(201).json({ workspace });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create workspace' });
+        res.status(500).json({ error: 'Failed to create workspace' + error });
     }
 });
 
