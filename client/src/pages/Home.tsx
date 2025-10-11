@@ -1,49 +1,49 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout/Layout";
-import { Viewteam } from "./Viewteam";
+import { Viewteam } from "./ViewTeam";
 import axios from "axios";
 import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalContext";
+import PrivateRoute from "@/router/PrivateRoutes";
 
-const teams = [
-  { name: "Team Alpha", members: 5, description: "Frontend & Backend Wizards" },
-  { name: "Team Beta", members: 4, description: "AI & ML Enthusiasts" },
-  { name: "Team Gamma", members: 6, description: "Design & UX Gurus" },
-];
+type Team = {
+  name: string;
+  description: string;
+  members: Array<unknown>;
+};
 
-const personalProjects = [
-  { name: "Project X", status: "In Progress" },
-  { name: "AI Experiment", status: "Idle" },
-  { name: "UI Revamp", status: "Completed" },
-  { name: "Project X", status: "In Progress" },
-  { name: "AI Experiment", status: "Idle" },
-  { name: "UI Revamp", status: "Completed" },
-];
-
+type personalWorkspace = {
+  name: string;
+  description: string;
+}
 
 const Home = () => {
-  const [selectedTeam, setSelectedTeam] = useState<null | typeof teams[0]>(null);
-  const {id} = useContext(GlobalContext);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [personalWorkspaces, setPersonalWorkspaces] = useState<personalWorkspace[]>([]);
+  const {id, name} = useContext(GlobalContext);
 
-  useEffect(()=>{
+  useEffect(() => {
     const getTeams = async()=>{
       try{
-        const teamDeatils = await axios.post("http://localhost:8000/workspaces/get",{userId:id},{withCredentials:true});
-        console.log(teamDeatils);
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/get`, {userId : id}, {withCredentials : true });
+        setTeams(response.data.teams);
+        setPersonalWorkspaces(response.data.personalWorkspaces);
       }
       catch(err){
         console.log(err);
       }
     }
     getTeams();
-  },[])
+  },[id])
 
   return (
     <Layout>
+      <PrivateRoute />
       <div className="bg-gray-900 min-h-screen text-white p-6">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-            Welcome, Name
+            Welcome {name}
           </h1>
           <p className="text-gray-400 mt-2">
             Manage your Teams, Projects, and AI Workflows
@@ -55,10 +55,10 @@ const Home = () => {
             Teams
           </h2>
           <div className="flex flex-wrap justify-center gap-6">
-            {teams.map((team, index) => (
+            {teams && teams.map((team, index) => (
               <div
                 key={index}
-                onClick={() => setSelectedTeam(team)} // ✅ select team on click
+                onClick={() => setSelectedTeam(team)}
                 className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-indigo-500/50"
               >
                 <h3 className="text-xl font-semibold text-indigo-300 mb-2">
@@ -66,7 +66,7 @@ const Home = () => {
                 </h3>
                 <p className="text-gray-400 mb-4">{team.description}</p>
                 <p className="text-gray-300 font-medium">
-                  Members: {team.members}
+                  Members: {team.members.length}
                 </p>
               </div>
             ))}
@@ -78,7 +78,7 @@ const Home = () => {
             Personal Workspace
           </h2>
           <div className="flex flex-wrap justify-center gap-6">
-            {personalProjects.map((project, index) => (
+            {personalWorkspaces.map((project, index) => (
               <div
                 key={index}
                 className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-pink-500/50"
@@ -86,7 +86,7 @@ const Home = () => {
                 <h3 className="text-xl font-semibold text-pink-300 mb-2">
                   {project.name}
                 </h3>
-                <p className="text-gray-400 mb-2">Status: {project.status}</p>
+                <p className="text-gray-400 mb-2">Status: {project.description}</p>
                 <button className="mt-2 cursor-pointer bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-4 rounded">
                   Open
                 </button>

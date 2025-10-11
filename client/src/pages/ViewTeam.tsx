@@ -9,7 +9,7 @@ interface ViewteamProps {
   team: {
     name: string;
     description: string;
-    members: number;
+    members: Array<unknown>;
   };
   onClose: () => void;
 }
@@ -38,7 +38,7 @@ export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
     };
 
     fetchUser();
-  }, [debouncedSearch]);
+  }, [id, debouncedSearch]);
 
   const handleAddMember = () => {
     if (!userResult) return;
@@ -58,7 +58,7 @@ export const Viewteam: React.FC<ViewteamProps> = ({ team, onClose }) => {
         <h2 className="text-2xl font-bold text-indigo-300 mb-2">{team.name}</h2>
         <p className="text-gray-400 mb-4">{team.description}</p>
         <p className="text-gray-300 font-medium mb-4">
-          Members: {team.members}
+          Members: {team.members.length}
         </p>
 
         <div className="mb-4">

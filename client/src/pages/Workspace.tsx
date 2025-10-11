@@ -17,11 +17,7 @@ import Dropdown from '@/components/Workspace/Dropdown';
 import Chatbot from '@/components/Workspace/Chatbot';
 import { Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
-import SchedulePicker from '@/components/Workspace/SchedulePicker';
-import EmailForm from '@/components/Workspace/EmailForm';
-import UploadBox from '@/utils/UploadBox';
-import axios from 'axios';
-import { Form } from 'react-router-dom';
+import PrivateRoute from '@/router/PrivateRoutes';
 
 interface AIFlowNodeData {
   label: string;
@@ -343,6 +339,7 @@ export default function Flow() {
 
   return (
     <Layout showFooter={false}>
+      <PrivateRoute />
       <div className="bg-[#2B3340] font-poppins min-h-screen">
         <div className="text-center text-[#D7FFCC] font-semibold text-[40px] pt-6">Create Your Workflow</div>
         <div className="text-center text-[#D7FFCC] opacity-[0.6] text-[18px] pb-2">These are the commands AI will be given</div>

@@ -16,7 +16,7 @@ export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) =>
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        const resp = await axios.get("http://localhost:8000/auth/verify", {
+        const resp = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/verify`, {
           withCredentials: true,
         });
         setIsLoggedIn(true);

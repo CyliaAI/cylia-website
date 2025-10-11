@@ -59,7 +59,7 @@ router.get("/google/callback", async (req, res) => {
     }
     catch (err) {
         console.error('OAuth callback error:', err.message);
-        res.status(500).send('OAuth failed');
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -90,7 +90,7 @@ router.get('/verify', async (request, response) => {
 
 router.post('/logout', async (req, res) => {
    try {
-    res.cookie('token', '', {
+    res.cookie('jwt', '', {
       httpOnly: true,
       maxAge: 0,
       secure: process.env.ENVIRONMENT === 'PROD',

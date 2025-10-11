@@ -13,7 +13,7 @@ export const PopupTeam: React.FC<PopupTeamProps> = ({ onClose }) => {
   const {id} = useContext(GlobalContext);
   const handleSave = async() => {
     try{
-        await axios.post('http://localhost:8000/workspaces/create-team',{name:teamName,description:teamDesc,userId:id},{withCredentials:true})
+        await axios.post(`${import.meta.env.VITE_BACKEND_URL}workspaces/create-team`,{name:teamName,description:teamDesc,userId:id},{withCredentials:true})
         onClose();
     }
     catch(err){

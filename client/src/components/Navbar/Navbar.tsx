@@ -1,15 +1,16 @@
 import axios from "axios";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { PopupTeam } from "../../pages/PopupTeam.tsx";
 import { useState } from "react";
 
 const Navbar = () => {
   const [click, setClick] = useState(false);
+  const navigate = useNavigate();
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:8000/auth/logout', {});
-      redirect('/login');
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {});
+      navigate("/login");
     } catch (err) {
       console.log(err);
     }

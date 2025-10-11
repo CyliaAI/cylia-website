@@ -13,7 +13,6 @@ router.post('/create-team', validateBody([
 ]), async (req, res) => {
     try {
         const { userId, name, description } = req.body;
-
         const team = await prisma.team.create({
             data: {
                 name,
@@ -21,7 +20,7 @@ router.post('/create-team', validateBody([
                 ownerId: userId,
             }
         });
-
+        //No description in schema
         const teamWithUser = await prisma.teamMember.create({
             data: {
                 teamId: team.id,
@@ -38,26 +37,32 @@ router.post('/create-team', validateBody([
 router.post('/get', async (req, res) => {
     try {
         const { userId } = req.body;
-
         if (!userId) return res.status(400).json({ message: "No User Found"});
-
+        
         const personalWorkspaces = await prisma.personalWorkspace.findMany({
             where: {
                 ownerId: userId
             }
         })
-
-        const Teams = await prisma.teamMembers.findMany({
+        
+        const teams = await prisma.teamMember.findMany({
             where: {
                 userId,
             },
             select: {
-                team: true
+                team: {
+                    select: {
+                        name: true,
+                        description: true,
+                        members: true,
+                    }
+                }
             }  
         });
-        
+        res.status(200).json({ personalWorkspaces, teams: teams.map(t => t.team) });
     } catch(err) {
-        res.status(500).json({ error: 'Failed to get Workspaces'})
+        console.error("Server Error: ", err);
+        res.status(500).json({ error: 'Failed to get Workspaces' + err})
     }
 })
 

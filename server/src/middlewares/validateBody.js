@@ -12,7 +12,6 @@ function validateBody(rules) {
   return function (req, res, next) {
     const body = req.body || {};
     const errors = [];
-
     for (const rule of rules) {
       const val = body[rule.key];
 
@@ -32,7 +31,6 @@ function validateBody(rules) {
     if (errors.length > 0) {
       return res.status(400).json({ message: 'Validation failed', errors });
     }
-
     next();
   };
 }
