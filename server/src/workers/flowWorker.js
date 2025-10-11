@@ -1,5 +1,5 @@
-// flowWorkerMQ.js
 import { Worker } from "bullmq";
+import { flowQueue } from "../workers/flowQueue.js";
 import { flowQueue } from "../workers/flowQueue.js"; // BullMQ Queue instance
 import { sendMail } from "../utils/sendMail.js";
 import { extractTextFromFile } from "../utils/ocr.js";
@@ -8,7 +8,8 @@ import { summarise, rag } from "../utils/ml.js";
 
 // Define Tasks which are asynchronous
 const uploadPDF = async (ctx) => {
-  // No Functionality here
+  console.log("upload");
+  await new Promise((r) => setTimeout(r, 200)); 
   return ctx;
 };
 
@@ -37,6 +38,7 @@ const sendEmail = async (ctx) => {
 }
 // Map of Task Names
 const taskMap = {
+  scheduleTask,
   uploadPDF,
   ocr,
   summarize,
@@ -65,6 +67,7 @@ const worker = new Worker(
   },
   {
     connection: flowQueue.opts.connection, // reuse your Redis connection from queue
+    concurrency: 5
   }
 );
 
