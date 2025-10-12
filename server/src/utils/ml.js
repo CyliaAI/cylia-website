@@ -4,7 +4,7 @@ import 'dotenv/config'
 
 export const summarise = async (model, text) => {
   try {
-    const response = await axios.post(`${process.env.ML_SERVER}/api/summarize`, { model_name: "llama3.2:1b", text }, {
+    const response = await axios.post(`${process.env.ML_SERVER}/api/summarize`, { model_name: model, text }, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -14,9 +14,9 @@ export const summarise = async (model, text) => {
   }
 };
 
-export const toVectorDB = async (userId, model, text) => {
+export const toVectorDB = async (userId, text) => {
   try {
-    const response = await axios.post(`${process.env.ML_SERVER}/api/add-docs`, { userId, model_name: model, text }, {
+    const response = await axios.post(`${process.env.ML_SERVER}/api/add-docs`, { userId, text }, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -26,9 +26,9 @@ export const toVectorDB = async (userId, model, text) => {
   }
 };
 
-export const rag = async (userId, model, query) => {
+export const rag = async (userId, query) => {
   try {
-    const response = await axios.post(`${process.env.ML_SERVER}/api/query`, { userId, model_name: model, query }, {
+    const response = await axios.post(`${process.env.ML_SERVER}/api/query`, { userId, query, model_name: "llama3.2:1b"  }, {
       headers: { "Content-Type": "application/json" },
     });
 

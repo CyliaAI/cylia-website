@@ -190,7 +190,7 @@ const Chatbot: React.FC = () => {
             >
               <div className={`rounded-full flex items-center text-white justify-center flex-shrink-0 ${
                 message.type === 'bot' 
-                  ? 'bg-gradient-to-br from-blue-500 to-purple-600 w-8 h-8' 
+                  ? '' 
                   : 'bg-gradient-to-br w-8 h-8 from-green-500 to-emerald-600'
               }`}>
                 {message.type === 'bot' ? <></> : <p>{name ? name[0] : "N"}</p>}

@@ -59,10 +59,6 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
     flow = flow || '[]';
     data = data || '{}';
 
-    console.log(req.file)
-
-    console.log(req.body)
-
     try {
       flow = JSON.parse(flow);
     } catch (err) {
@@ -85,7 +81,6 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
       data.start = dateTimeToCron(data['Schedule'][0])
     }
     console.log("start time")
-    console.log(data.start)
 
     if (req.file) {
       if (req.file.mimetype === "application/pdf") {

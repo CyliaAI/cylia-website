@@ -40,13 +40,13 @@ const summarize = async (ctx) => {
 };
 
 const ToVectorDB = async (ctx) => {
-  const success = await toVectorDB(ctx.userId, ctx.model, ctx.content);
+  const success = await toVectorDB(ctx.userId, ctx.content);
   console.log(success)
   return ctx;
 };
 
 const RAG = async (ctx) => {
-  const retrieved_text = await rag(ctx.userId, ctx.model, ctx.content);
+  const retrieved_text = await rag(ctx.userId, ctx["RAG"][0]);
   ctx.content = retrieved_text;
   return ctx;
 }
@@ -56,7 +56,7 @@ const SendEmail = async (ctx) => {
   console.log(ctx['SendEmail'][ctx['SendEmail'].length - 1])
   const email = ctx['SendEmail'][ctx['SendEmail'].length - 1][0]
   const subject = ctx['SendEmail'][ctx['SendEmail'].length - 1][1]
-  await sendMail(email, "Automated Email from Cylia", ctx.content)
+  await sendMail(email, subject, ctx.content)
   return ctx;
 }
 
@@ -86,28 +86,21 @@ const Schedule = async (ctx) => {
 
   schedule.scheduleJob(newCtx.start, async () => {
     console.log(`Resuming scheduled flow from ${newCtx.start}...`);
-    console.log(newCtx)
+
     await flowQueue.add("flow-job", {
       flow: remainingFlow,
       data: newCtx
     });
   });
 
-  console.log(`Workflow paused. Will resume at ${newCtx.start}.`);
   return ctx;
 };
 
 
 
 const LLM = async (ctx) => {
-  console.log("_________________________")
-  console.log(ctx.content)
-  console.log("_________________________")
   const summary = await summarise(ctx.model, ctx.content);
   if (summary) ctx.content = summary;
-  console.log("*************************")
-  console.log(ctx.content)
-  console.log("*************************")
   return ctx;
 }
 // Map of Task Names

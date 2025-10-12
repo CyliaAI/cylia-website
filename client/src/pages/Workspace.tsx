@@ -32,6 +32,8 @@ interface AIFlowNodeData {
   style?: React.CSSProperties;
   type?: string;
   component?: React.ReactNode;
+  input?: string;
+  status?: string;
 }
 
 interface NodeInputValues {
@@ -133,6 +135,10 @@ export default function Flow({ type }: { type: string }) {
     const compressed = LZString.compressToBase64(JSON.stringify(flow));
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
+
+  function getNodeByLabel(label: string) {
+    return nodes.find((n) => n.data.label === label);
+  }
 
   const saveFlowToDB = (nodes: Node<AIFlowNodeData>[], edges: Edge[]) => {
     const serializableNodes = nodes.map(({ id, type, position, data, style }) => ({
@@ -359,6 +365,10 @@ export default function Flow({ type }: { type: string }) {
     toast.success("Canvas cleared!");
   };
 
+  const exportAsText = () => {
+    
+  }
+
   useEffect(() => {
     const order = getFlowOrder(nodes, edges);
     setFlowOrder(order);
@@ -440,10 +450,11 @@ export default function Flow({ type }: { type: string }) {
                 Cancel
               </button>
               <button 
+                onClick={exportAsText}
                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <Download size={18} />
-                Export
+                Download as .txt
               </button>
             </div>
           </div>
