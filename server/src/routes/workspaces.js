@@ -161,7 +161,7 @@ router.post('/get-workflow', validateBody([
     }
 });
 
-router.post('get-team-workflow', validateBody([
+router.post('/get-team-workflow', validateBody([
     { key: 'teamId', type: 'number', required: true },
 ]), async(req, res) => {
     try {

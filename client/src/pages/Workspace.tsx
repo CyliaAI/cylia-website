@@ -17,7 +17,7 @@ import 'reactflow/dist/style.css';
 import Layout from '../components/Layout/Layout';
 import Dropdown from '@/components/Workspace/Dropdown';
 import Chatbot from '@/components/Workspace/Chatbot';
-import { Settings, Save, Play, Download, Trash2, Info } from 'lucide-react';
+import { Settings, Save, Play, Download, Trash2, Info, Copy, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
@@ -366,8 +366,30 @@ export default function Flow({ type }: { type: string }) {
   };
 
   const exportAsText = () => {
+    const data = { nodes, edges };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
     
-  }
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "graph_data.txt";
+    a.click();
+
+    setExportPop(false);
+
+    URL.revokeObjectURL(url);
+  };
+
+  const copyToClipboard = async () => {
+    const data = { nodes, edges };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      toast.success("Copied to clipboard!");
+      setExportPop(false);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   useEffect(() => {
     const order = getFlowOrder(nodes, edges);
@@ -439,15 +461,18 @@ export default function Flow({ type }: { type: string }) {
       {!isValid && <Navigate to="/not-found"/>}
       {exportPop && (
         <div className='min-h-screen w-full fixed bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center'>
-          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-white mb-4">Export Workflow</h2>
+          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-lg w-full mx-4">
+            <div className='justify-between flex'>
+              <h2 className="text-2xl font-bold text-white mb-4">Export Workflow</h2>
+              <button onClick={() => setExportPop(false)} className='bg-red-400 rounded-2xl px-3'><X size={18}/></button>
+            </div>
             <p className="text-gray-300 mb-6">Download your workflow configuration</p>
             <div className="flex gap-3">
               <button 
-                onClick={() => setExportPop(false)}
-                className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-200"
+                onClick={copyToClipboard}
+                className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                Cancel
+                <Copy size={18}/>Copy to clipboard
               </button>
               <button 
                 onClick={exportAsText}
