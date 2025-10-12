@@ -15,8 +15,6 @@ export async function extractTextFromFile(file) {
   try {
     const { data } = await worker.recognize(file.path);
     return data.text
-    +`
-    pppppppppp`
   } catch (err) {
     console.error("OCR failed:", err);
   } finally {
