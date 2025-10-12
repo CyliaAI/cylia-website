@@ -2,25 +2,21 @@ import { useState, useEffect } from "react";
 
 interface UploadBoxProps {
   nodeLabel?: string;
-  onValueChange?: (label: string, value: File | null) => void;
+  onValueChange?: (label: string, value: File) => void; // No nulls
 }
 
 export default function UploadBox({ nodeLabel, onValueChange }: UploadBoxProps) {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setFile(null);
-      return;
-    }
-    setFile(e.target.files[0]);
-  };
+    if (!e.target.files || e.target.files.length === 0) return;
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
 
-  useEffect(() => {
     if (nodeLabel && onValueChange) {
-      onValueChange(nodeLabel, file);
+      onValueChange(nodeLabel, selectedFile);
     }
-  }, [file]);
+  };
 
   return (
     <div className="flex flex-col gap-2 text-[6px] text-gray-400">
@@ -30,12 +26,14 @@ export default function UploadBox({ nodeLabel, onValueChange }: UploadBoxProps) 
       >
         {file ? file.name : "Upload File"}
       </label>
+
       <input
         id={`upload-${nodeLabel}`}
         type="file"
         onChange={handleFileChange}
         className="hidden"
       />
+
       {file && (
         <div className="text-[5px] pl-2">
           {file.name} ({Math.round(file.size / 1024)} KB)

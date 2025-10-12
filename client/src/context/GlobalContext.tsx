@@ -10,6 +10,8 @@ export type GlobalContextType = {
   setEmail: React.Dispatch<React.SetStateAction<string | null>>;
   name: string | null;
   setName: React.Dispatch<React.SetStateAction<string | null>>;
+  loading: boolean | null;
+  setLoading: React.Dispatch<React.SetStateAction<boolean | null>>;
 };
 
 const GlobalContextState: GlobalContextType = {
@@ -21,6 +23,8 @@ const GlobalContextState: GlobalContextType = {
   setEmail: () => {},
   name: null,
   setName: () => {},
+  loading: null,
+  setLoading: () => {},
 };
 
 export const GlobalContext = createContext<GlobalContextType>(GlobalContextState);
