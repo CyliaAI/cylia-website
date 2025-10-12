@@ -14,7 +14,7 @@ const Layout = ({
 	showFooter = true,
 }: LayoutProps) => {
 	return (
-		<div className="relative h-full w-full z-[100]">
+		<div className="relative h-full w-full z-[100] antialiased font-poppins">
 			{showNavbar && <Navbar />}
 			{children}
 			{showFooter && <Footer />}

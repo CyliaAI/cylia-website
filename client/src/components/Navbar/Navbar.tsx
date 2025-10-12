@@ -11,7 +11,7 @@ const Navbar = () => {
   const logout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`,{},{withCredentials:true});
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       console.log(err);
     }
@@ -23,7 +23,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed w-full px-10 py-4 z-50 transition-all duration-300`}
+      className={`fixed w-full px-10 py-4 z-50 transition-all duration-300 bg-black/20`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center">
@@ -44,8 +44,8 @@ const Navbar = () => {
           </div>}
           {!isLoggedIn && (
             <div className="flex gap-3">
-              <button className="">Login</button>
-              <button className="">Register Now</button>
+              <button onClick={() => navigate("/login")} className="text-white bg-green-600 px-4 py-2 cursor-pointer rounded-lg transition-all duration-300 hover:bg-green-700">Login</button>
+              <button onClick={() => navigate("/login")} className="text-green-600 border-green-600 border-2 px-4 py-2 cursor-pointer rounded-lg hover:bg-green-700 hover:border-green-700 hover:text-white transition-all duration-300">Register Now</button>
             </div>
           )}
         </div>

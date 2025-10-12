@@ -1,12 +1,12 @@
 import { useEffect, useState, useContext } from "react";
 import Layout from "../components/Layout/Layout";
-import { ViewTeam } from "./ViewTeam";
+import { ViewTeam } from "../components/Popups/ViewTeam";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalContext";
 import PrivateRoute from "@/router/PrivateRoutes";
-import { PersonalPopUp } from "./PersonalPopUp";
-import { PopupTeam } from "./PopupTeam";
+import { PersonalPopUp } from "../components/Popups/PersonalPopUp";
+import { PopupTeam } from "../components/Popups/PopupTeam";
 
 type Team = {
   name: string;

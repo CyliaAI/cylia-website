@@ -6,6 +6,8 @@ import ReactFlow, {
   Handle,
   Position,
   Controls,
+  Background,
+  MiniMap,
 } from 'reactflow';
 import type { Node, Edge, NodeChange, EdgeChange, Connection, ReactFlowInstance, XYPosition } from 'reactflow';
 import Cookies from 'js-cookie';
@@ -15,7 +17,7 @@ import 'reactflow/dist/style.css';
 import Layout from '../components/Layout/Layout';
 import Dropdown from '@/components/Workspace/Dropdown';
 import Chatbot from '@/components/Workspace/Chatbot';
-import { Settings } from 'lucide-react';
+import { Settings, Save, Play, Download, Trash2, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
@@ -42,20 +44,54 @@ type NodeType = {
 };
 
 const styleMap: Record<string, React.CSSProperties> = {
-  MID: { color: '#fff', borderWidth: '7px 1px 1px 1px', borderStyle: 'solid', borderColor: '#06b6d4', borderRadius: 5, padding: '10px 20px', fontWeight: 'bold', boxShadow: '2px 2px 10px rgba(0,0,0,0.3)', textAlign: 'center' },
-  END: { color: '#fff', borderWidth: '7px 1px 1px 1px', borderStyle: 'solid', borderColor: '#FF5858', borderRadius: 5, padding: '10px 15px', fontStyle: 'italic', boxShadow: 'inset 0 0 5px rgba(0,0,0,0.2)', textAlign: 'center' },
-  BEGIN: { color: '#fff', borderWidth: '7px 1px 1px 1px', borderStyle: 'solid', borderColor: '#6EFF7F', borderRadius: 5, padding: '12px 16px', fontFamily: 'monospace', fontWeight: '500', boxShadow: '2px 2px 5px rgba(0,0,0,0.2)', textAlign: 'center' },
+  MID: { 
+    color: '#fff', 
+    borderWidth: '3px 1px 1px 1px', 
+    borderStyle: 'solid', 
+    borderColor: '#06b6d4', 
+    borderRadius: 8, 
+    padding: '12px 20px', 
+    fontWeight: 'bold', 
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    textAlign: 'center',
+    backdropFilter: 'blur(4px)'
+  },
+  END: { 
+    color: '#fff', 
+    borderWidth: '3px 1px 1px 1px', 
+    borderStyle: 'solid', 
+    borderColor: '#FF5858', 
+    borderRadius: 8, 
+    padding: '12px 18px', 
+    fontStyle: 'italic', 
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    textAlign: 'center',
+    backdropFilter: 'blur(4px)'
+  },
+  BEGIN: { 
+    color: '#fff', 
+    borderWidth: '3px 1px 1px 1px', 
+    borderStyle: 'solid', 
+    borderColor: '#6EFF7F', 
+    borderRadius: 8, 
+    padding: '12px 18px', 
+    fontFamily: 'monospace', 
+    fontWeight: '600', 
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    textAlign: 'center',
+    backdropFilter: 'blur(4px)'
+  },
 };
 
 const initialNodes: Node<AIFlowNodeData>[] = [
-  { id: '1', type: 'default', data: { label: 'Start' }, position: { x: 50, y: 50 } },
-  { id: '2', type: 'default', data: { label: 'Output' }, position: { x: 400, y: 50 } },
+  { id: '1', type: 'default', data: { label: 'Start' }, position: { x: 100, y: 100 } },
+  { id: '2', type: 'default', data: { label: 'Output' }, position: { x: 500, y: 100 } },
 ];
 
 const initialEdges: Edge[] = [];
 
 export default function Flow({ type }: { type: string }) {
-  const { id } = useGlobalContext();
+  const { id, loading } = useGlobalContext();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [isValid, setIsValid] = useState<boolean>(true)
   const [nodes, setNodes] = useState<Node<AIFlowNodeData>[]>(initialNodes);
@@ -97,6 +133,29 @@ export default function Flow({ type }: { type: string }) {
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
 
+  const saveFlowToDB = (nodes: Node<AIFlowNodeData>[], edges: Edge[]) => {
+    const serializableNodes = nodes.map(({ id, type, position, data, style }) => ({
+      id,
+      type,
+      position,
+      style,
+      data: {
+        label: data.label,
+        type: data.type,
+        style: data.style,
+      },
+    }));
+
+    const workflow = { nodes: serializableNodes, edges }
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/save-workflow`, {workspaceId: Number(workspaceId), workflow})
+    .then(res => {
+      console.log(res);
+      toast.success("Workflow has been successfully saved");
+    })
+    .catch(err => {
+      console.error(err);
+    })
+  }
 
   const loadFlowFromCookie = () => {
     const compressed = Cookies.get('myFlow');
@@ -149,13 +208,18 @@ export default function Flow({ type }: { type: string }) {
 
   const nodeTypesList: NodeType[] = [
     {
+      type: 'BEGIN',
+      label: 'Document',
+      component: <UploadBox  />,
+    },
+    {
       type: 'MID',
       label: 'LLM',
       component: <Dropdown label="Select Model" options={['gpt-4', 'gpt-3.5-turbo', 'claude-3', 'llama-2-13b', 'mpt-7b', 'falcon-40b']}/>,
     },
     {
       type: 'MID',
-      label: 'To VectorDB',
+      label: 'toVectorDB',
       component: <Dropdown label="Select DB" options={['Faiss', 'pgvector', 'Pinecone', 'Qdrant (Managed)']} />,
     },
     {
@@ -178,11 +242,6 @@ export default function Flow({ type }: { type: string }) {
       label: 'SendEmail',
       component: <EmailForm />,
     },
-    {
-      type: 'BEGIN',
-      label: 'Document',
-      component: <UploadBox  />,
-    },
   ];
 
   const nodeTypeMap: Record<string, NodeType> = {};
@@ -190,9 +249,9 @@ export default function Flow({ type }: { type: string }) {
 
   const DefaultNode = ({ data }: { data: AIFlowNodeData }) => {
     const bgMap: Record<string, string> = {
-      MID: 'bg-blue-400/15',
-      END: 'bg-red-400/15',
-      BEGIN: 'bg-green-400/15',
+      MID: 'bg-cyan-500/5',
+      END: 'bg-red-500/5',
+      BEGIN: 'bg-green-500/5',
     };
 
     const component = nodeTypeMap[data.label]?.component ?? null;
@@ -205,6 +264,9 @@ export default function Flow({ type }: { type: string }) {
               ...prev,
               [label]: [...(prev[label] || []), value],
             }));
+            if (label == "Document") {
+              setUploaded(true);
+            }
           },
         })
       : component;
@@ -213,13 +275,13 @@ export default function Flow({ type }: { type: string }) {
       <div
         style={{ position: 'relative', ...data.style }}
         className={`${bgMap[data.type]} ${
-          data.label === 'Start' || data.label === 'Output' ? 'w-full' : 'w-fit'
-        } backdrop-blur-[1px] font-poppins`}
+          data.label === 'Start' || data.label === 'Output' ? 'w-full min-w-[120px]' : 'w-fit min-w-[140px]'
+        } font-poppins`}
       >
-        {data.label !== 'Start' && <Handle type="target" position={Position.Left} />}
-        <div className="text-[8px] mb-2">{data.label}</div>
+        {data.label !== 'Start' && <Handle type="target" position={Position.Left} className="w-3 h-3" />}
+        <div className="text-[10px] my-2 font-semibold tracking-wide">{data.label}</div>
         <div>{renderedComponent}</div>
-        {data.label !== 'Output' && <Handle type="source" position={Position.Right} />}
+        {data.label !== 'Output' && <Handle type="source" position={Position.Right} className="w-3 h-3" />}
       </div>
     );
   };
@@ -269,6 +331,7 @@ export default function Flow({ type }: { type: string }) {
     console.log("Flow Order:", flowOrder);
     console.log("Node Inputs:", nodeInputsMap);
     const formData = new FormData();
+    console.log(uploaded)
     if (uploaded) {
       const allFiles = (nodeInputsMap.Document || []).filter(f => f instanceof File);
       formData.append('file', allFiles[0])
@@ -286,6 +349,13 @@ export default function Flow({ type }: { type: string }) {
       console.error('Error submitting flow:', error);
     });
     toast.success("Flow submitted! Check console for details.");
+  };
+
+  const handleClear = () => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    setNodeInputValues({});
+    toast.success("Canvas cleared!");
   };
 
   useEffect(() => {
@@ -334,14 +404,19 @@ export default function Flow({ type }: { type: string }) {
           } else {
             setNodes(res.data.workflow.nodes);
             setEdges(res.data.workflow.edges);
+            toast.success('DB flow loaded');
           }
+        } else {
+          setNodes(res.data.workflow.nodes);
+          setEdges(res.data.workflow.edges);
+          toast.success('DB flow loaded');
         }
       })
       .catch(err => {
         setIsValid(false);
         console.error(err);
       })
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     const timer = setTimeout(() => saveFlowToCookie(nodes, edges), 1000);
@@ -352,33 +427,132 @@ export default function Flow({ type }: { type: string }) {
     <Layout showFooter={false}>
       {!isValid && <Navigate to="/not-found"/>}
       {exportPop && (
-        <div className='min-h-screen w-full fixed bg-black/50 z-[100]'>
-
+        <div className='min-h-screen w-full fixed bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center'>
+          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold text-white mb-4">Export Workflow</h2>
+            <p className="text-gray-300 mb-6">Download your workflow configuration</p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setExportPop(false)}
+                className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-200"
+              >
+                Cancel
+              </button>
+              <button 
+                className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Download size={18} />
+                Export
+              </button>
+            </div>
+          </div>
         </div>
       )}
       <PrivateRoute />
-      <div className="bg-[#2B3340] font-poppins min-h-screen">
-        <div className="text-center text-[#D7FFCC] font-semibold text-[40px] pt-6">Create Your Workflow</div>
-        <div className="text-center text-[#D7FFCC] opacity-[0.6] text-[18px] pb-2">These are the commands AI will be given</div>
+      <div className="bg-gradient-to-br from-[#1a1f2e] via-[#2B3340] to-[#1e2733] font-poppins min-h-screen pt-20">
+        <div className="pt-8 pb-6 px-6 border-b border-gray-700/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-6">
+              <h1 className="text-[#D7FFCC] font-bold text-4xl mb-2 tracking-tight">
+                Create Your Workflow
+              </h1>
+              <p className="text-[#D7FFCC]/60 text-lg">
+                Design AI-powered automation flows with drag-and-drop simplicity
+              </p>
+            </div>
 
-        <div className="flex justify-end px-4 py-2 gap-3">
-          <button onClick={() => setExportPop(true)} className="border-[#D7FFCC] text-[#D7FFCC] cursor-pointer border px-3 py-1 rounded-full hover:bg-[#D7FFCC] hover:text-black transition-all duration-200">Export</button>
-          <button className="text-[#D7FFCC] cursor-pointer"><Settings size={30} /></button>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2 bg-blue-500/10 rounded-lg border border-blue-500/20"></div>
+              
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => saveFlowToDB(nodes, edges)}
+                  className="flex items-center gap-2 bg-gray-700/50 text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-200 border border-gray-600/50"
+                >
+                  <Save size={18} />
+                  <span className="hidden sm:inline">Save</span>
+                </button>
+                <button 
+                  onClick={handleClear}
+                  className="flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/20 transition-all duration-200 border border-red-500/30"
+                >
+                  <Trash2 size={18} />
+                  <span className="hidden sm:inline">Clear</span>
+                </button>
+                <button 
+                  onClick={() => setExportPop(true)} 
+                  className="flex items-center gap-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-lg hover:bg-green-500/20 transition-all duration-200 border border-green-500/30"
+                >
+                  <Download size={18} />
+                  <span className="hidden sm:inline">Export</span>
+                </button>
+                <button className="flex items-center gap-2 bg-gray-700/50 text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-200 border border-gray-600/50">
+                  <Settings size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex h-screen">
-          <div className="w-52 p-2 border-r border-gray-700 bg-gray-900">
-            <h3 className="font-bold mb-2 text-[#9DD4B2]">Workflows</h3>
-            <div className="flex flex-col gap-2">
-              {nodeTypesList.map((node) => (
-                <div key={node.label} draggable onDragStart={(e) => onDragStart(e, node.label, node.type)} style={{ position: 'relative', ...styleMap[node.type] }} className="backdrop-blur-[1px] font-poppins cursor-pointer">
-                  <div className="text-[8px]">{node.label}</div>
-                </div>
-              ))}
+        <div className="flex h-[calc(100vh-220px)]">
+          <div className="w-64 p-4 border-r border-gray-700/50 bg-gray-900/50 backdrop-blur-sm overflow-y-auto">
+            <div className="mb-6">
+              <h3 className="font-bold text-lg mb-1 text-[#9DD4B2] flex items-center gap-2">
+                <span className="w-1 h-5 bg-[#9DD4B2] rounded-full"></span>
+                Workflow Nodes
+              </h3>
+              <p className="text-xs text-gray-400 ml-3">Drag to canvas to add</p>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <div className="text-xs font-semibold text-green-400 mb-2 uppercase tracking-wider">Inputs</div>
+                {nodeTypesList.filter(n => n.type === 'BEGIN').map((node) => (
+                  <div 
+                    key={node.label} 
+                    draggable 
+                    onDragStart={(e) => onDragStart(e, node.label, node.type)} 
+                    style={{ position: 'relative', ...styleMap[node.type] }} 
+                    className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
+                  >
+                    <div className="text-[10px] font-semibold">{node.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <div className="text-xs font-semibold text-cyan-400 mb-2 uppercase tracking-wider">Processing</div>
+                {nodeTypesList.filter(n => n.type === 'MID').map((node) => (
+                  <div 
+                    key={node.label} 
+                    draggable 
+                    onDragStart={(e) => onDragStart(e, node.label, node.type)} 
+                    style={{ position: 'relative', ...styleMap[node.type] }} 
+                    className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
+                  >
+                    <div className="text-[10px] font-semibold">{node.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <div className="text-xs font-semibold text-red-400 mb-2 uppercase tracking-wider">Outputs</div>
+                {nodeTypesList.filter(n => n.type === 'END').map((node) => (
+                  <div 
+                    key={node.label} 
+                    draggable 
+                    onDragStart={(e) => onDragStart(e, node.label, node.type)} 
+                    style={{ position: 'relative', ...styleMap[node.type] }} 
+                    className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
+                  >
+                    <div className="text-[10px] font-semibold">{node.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div ref={reactFlowWrapper} tabIndex={0} className="flex-1 h-full">
+          <div ref={reactFlowWrapper} tabIndex={0} className="flex-1 h-full relative">
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -389,17 +563,51 @@ export default function Flow({ type }: { type: string }) {
               onDragOver={onDragOver}
               fitView
               onInit={setReactFlowInstance}
-              className="w-full h-full bg-[url('/bg.svg')] bg-center bg-[length:40%]"
+              className="w-full h-full"
               nodeTypes={nodeTypes}
               noDragClassName="nodrag"
+              defaultEdgeOptions={{
+                animated: true,
+                style: { stroke: '#6EFF7F', strokeWidth: 2 }
+              }}
             >
-              <Controls />
+              <Controls className="bg-gray-800/90 border border-gray-700 rounded-lg" />
+              <MiniMap 
+                className="bg-gray-900/90 border border-gray-700 rounded-lg" 
+                nodeColor={(node) => {
+                  const typeColors = {
+                    BEGIN: '#6EFF7F',
+                    MID: '#06b6d4',
+                    END: '#FF5858'
+                  };
+                  return typeColors[node.data.type as keyof typeof typeColors] || '#999';
+                }}
+              />
+              <Background color="#4a5568" gap={16} />
             </ReactFlow>
           </div>
         </div>
-        <button onClick={handleSubmit} className="border-blue-950 bg-blue-600 font-semibold text-white border px-3 py-1 text-xl rounded-md hover:bg-blue-500 transition-all duration-200 cursor-pointer">
-            Submit
-        </button>
+
+        <div className="border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-400">
+                <span className="font-semibold text-gray-300">{nodes.length}</span> nodes
+                <span className="mx-2">•</span>
+                <span className="font-semibold text-gray-300">{edges.length}</span> connections
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleSubmit} 
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 font-semibold text-white px-6 py-3 text-lg rounded-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <Play size={20} />
+              Run Workflow
+            </button>
+          </div>
+        </div>
+
         <Chatbot />
       </div>
     </Layout>

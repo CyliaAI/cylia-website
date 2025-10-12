@@ -55,7 +55,7 @@ router.post('/get', validateBody([
             select: {
                 team: {
                     select: {
-                        workspaceId: true,
+                        id: true,
                         name: true,
                         description: true,
                         members: true,
@@ -116,7 +116,7 @@ router.post('/save-workflow', validateBody([
     { key: 'workflow', type: 'object', required: true },
 ]), async(req, res) => {
     try {
-        const { workspaceId, nodes, edges } = req.body;
+        const { workspaceId, workflow } = req.body;
         const workspace = await prisma.personalWorkspace.update({
             where: { id: workspaceId },
             data: { workflow }

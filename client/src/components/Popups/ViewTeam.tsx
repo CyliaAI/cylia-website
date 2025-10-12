@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
-import { GlobalContext } from "../context/GlobalContext";
+import { GlobalContext } from "../../context/GlobalContext";
 
 interface ViewteamProps {
   team: {

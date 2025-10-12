@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useContext } from "react";
-import { GlobalContext } from "../context/GlobalContext";
+import { GlobalContext } from "../../context/GlobalContext";
 
 interface PopupTeamProps {
   onClose: () => void;

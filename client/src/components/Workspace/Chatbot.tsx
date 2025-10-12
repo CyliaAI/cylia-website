@@ -38,13 +38,15 @@ const Chatbot: React.FC = () => {
   }, [messages, isTyping])
 
   const fetchBotResponse = async (userMessage: string) => {
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/chatbot/chat`, { model:"gemini-2.5-flash", text: userMessage })
+    const message = axios.post(`${import.meta.env.VITE_BACKEND_URL}/chatbot/chat`, { model:"gemini-2.5-flash", text: userMessage })
     .then(res => {
-      console.log(res);
+      return res.data.result
     })
     .catch(err => {
       console.error(err);
     })
+
+    return message
   }
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement | HTMLDivElement>) => {

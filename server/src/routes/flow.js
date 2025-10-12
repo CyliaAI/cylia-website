@@ -70,8 +70,6 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
       if (req.file.mimetype === "application/pdf") {
         const imagePaths = await pdfImg(req.file.path);
         data.isPdf = true;
-
-        // Replace req.file with an array of image objects
         data.file = imagePaths.map((p) => ({
           path: p,
           mimetype: "image/png",

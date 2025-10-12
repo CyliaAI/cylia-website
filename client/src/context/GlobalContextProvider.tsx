@@ -12,6 +12,7 @@ export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) =>
   const [id, setId] = useState<number | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean | null>(true);
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -24,9 +25,12 @@ export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) =>
         setEmail(resp.data.user.email || null);
         setName(resp.data.user.name || null);
       } 
-	  catch (err) {
+	    catch (err) {
         console.error(err);
         setIsLoggedIn(false);
+      }
+      finally {
+        setLoading(false);
       }
     };
     verifyAuth();
@@ -41,6 +45,8 @@ export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) =>
     setEmail,
     name,
     setName,
+    loading,
+    setLoading
   };
 
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
