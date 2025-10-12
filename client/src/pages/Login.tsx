@@ -204,10 +204,10 @@ const page = () => {
             
           </div>
           <div className={`w-[40%] p-10 z-[11] text-white flex flex-col absolute pointer-events-none right-[3vw] justify-center top-[30vh] scale-150 items-center transition-all ${showSignUp ? "opacity-0 pointer-events-none translate-y-10" : "opacity-100 pointer-events-auto delay-700"}`}>
-            <h2 className='text-white text-2xl font-semibold text-shadow-[0px_0px_16px_rgb(255,255,255)] animate-pulse'>Welcome Back Vendor!</h2>
+            <h2 className='text-white text-2xl font-semibold text-shadow-[0px_0px_16px_rgb(255,255,255)] animate-pulse'>Welcome Back User!</h2>
             <p className="text-white/90 text-md ml-6 font-medium drop-shadow-lg">
               Manage your listings and update new ones on your  
-              <span className="text-cyan-400 font-semibold"> vendor portal!</span>
+              <span className="text-cyan-400 font-semibold"> Login Portal</span>
             </p>
           </div>
         </div>
