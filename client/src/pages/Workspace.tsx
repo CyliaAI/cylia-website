@@ -25,6 +25,7 @@ import UploadBox from '@/components/Workspace/UploadBox';
 import SchedulePicker from '@/components/Workspace/SchedulePicker';
 import { useGlobalContext } from '@/context/GlobalContext';
 import { Navigate, useParams } from 'react-router-dom';
+import RAGInput from '@/components/Workspace/RAGInput';
 
 interface AIFlowNodeData {
   label: string;
@@ -91,7 +92,6 @@ const initialNodes: Node<AIFlowNodeData>[] = [
 const initialEdges: Edge[] = [];
 
 export default function Flow({ type }: { type: string }) {
-  const { id, loading } = useGlobalContext();
   const { id, loading } = useGlobalContext();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [isValid, setIsValid] = useState<boolean>(true)
@@ -231,12 +231,12 @@ export default function Flow({ type }: { type: string }) {
     {
       type: 'END',
       label: 'FiletoText',
-      component: <div className="text-[6px] text-gray-400 font-semibold">Yea Sure Lol</div>,
+      component: <div className="text-[6px] text-gray-400 font-semibold">This will convert the inserted document node into text and produce it to the next node</div>,
     },
     {
       type: 'END',
       label: 'RAG',
-      component: <div className="text-[6px] text-gray-400 font-semibold">This will retrieve relevant info from the specified vectorDB</div>,
+      component: <RAGInput />,
     },
     {
       type: 'END',

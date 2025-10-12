@@ -3,7 +3,7 @@ import { useGlobalContext } from "../context/GlobalContext"
 
 const PrivateRoute = () => {
         const { isLoggedIn } = useGlobalContext()
-        if(isLoggedIn==null) return <div>Loading...</div>
+        if(isLoggedIn==null) return <div></div>
         return isLoggedIn ? (
                 <div></div>
         ) : (
