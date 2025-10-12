@@ -3,7 +3,8 @@ import { flowQueue } from "../workers/flowQueue.js"; // BullMQ Queue instance
 import { sendMail } from "../utils/sendMail.js";
 import { extractTextFromFile } from "../utils/ocr.js";
 import { uploadFiles } from "../middlewares/uploadFiles.js";
-import { summarise, rag } from "../utils/ml.js";
+import { summarise, rag, toVectorDB } from "../utils/ml.js";
+import schedule from 'node-schedule'
 
 // Define Tasks which are asynchronous
 const Document = async (ctx) => {
@@ -26,28 +27,32 @@ const FiletoText = async (ctx) => {
     });
   }
 
-  console.log("Content")
-  console.log(ctx.content)
-
+  console.log("Content : ", ctx.content)
   return ctx;
 };
 
 const summarize = async (ctx) => {
-  console.log("in summary")
+  console.log("in Summary");
   const summary = await summarise(ctx.model, ctx.content);
   ctx.content = summary;
   console.log(ctx.content)
   return ctx;
 };
 
+const ToVectorDB = async (ctx) => {
+  const success = await toVectorDB(ctx.userId, ctx.model, ctx.content);
+  console.log(success)
+  return ctx;
+};
+
 const RAG = async (ctx) => {
-  const retrieved_text = await rag(ctx.model, ctx.content);
+  const retrieved_text = await rag(ctx.userId, ctx.model, ctx.content);
   ctx.content = retrieved_text;
   return ctx;
 }
 
 const SendEmail = async (ctx) => {
-  console.log("in send mail")
+  console.log("Mail")
   console.log(ctx['SendEmail'][ctx['SendEmail'].length - 1])
   const email = ctx['SendEmail'][ctx['SendEmail'].length - 1][0]
   const subject = ctx['SendEmail'][ctx['SendEmail'].length - 1][1]
@@ -66,21 +71,53 @@ const Output = async (ctx) => {
 }
 
 const Schedule = async (ctx) => {
-  console.log("Scheduled");
-  return ctx
-}
+  console.log("Scheduled at:", ctx.start);
+
+  const currentIndex = ctx.flow.indexOf("Schedule");
+
+  // Take everything after Schedule
+  const remainingFlow = ctx.flow.slice(currentIndex + 1);
+
+  // Make a fresh context for the next run
+  const newCtx = { ...ctx };
+  newCtx.flow = remainingFlow;
+  newCtx.content = '';
+  ctx.skip = true;
+
+  schedule.scheduleJob(newCtx.start, async () => {
+    console.log(`Resuming scheduled flow from ${newCtx.start}...`);
+    console.log(newCtx)
+    await flowQueue.add("flow-job", {
+      flow: remainingFlow,
+      data: newCtx
+    });
+  });
+
+  console.log(`Workflow paused. Will resume at ${newCtx.start}.`);
+  return ctx;
+};
+
+
 
 const LLM = async (ctx) => {
+  console.log("_________________________")
+  console.log(ctx.content)
+  console.log("_________________________")
   const summary = await summarise(ctx.model, ctx.content);
-  ctx.content = summary;
+  if (summary) ctx.content = summary;
+  console.log("*************************")
+  console.log(ctx.content)
+  console.log("*************************")
   return ctx;
 }
 // Map of Task Names
 const taskMap = {
   Document,
   FiletoText,
+  ToVectorDB,
   RAG,
   LLM,
+  Schedule,
   SendEmail,
   Start,
   Output,
@@ -90,27 +127,25 @@ const taskMap = {
 const worker = new Worker(
   flowQueue.name,
   async (job) => {
-    console.log("Processing job:", job.id);
-
     const { flow, data } = job.data;
-    let context = { ...data };
-    console.log(context)
-    for (const step of flow) {
+    let context = { ...data, flow: [...flow] }; // clone flow into context
+
+
+    for (const step of flow.slice()) {
+      if (context.skip) break;
       const fn = taskMap[step];
       if (!fn) throw new Error(`Unknown task: ${step}`);
-
       context = await fn(context);
+      context.flow.shift();
     }
 
-    console.log(`Job ${job.id} completed`);
     return context;
   },
   {
-    connection: flowQueue.opts.connection, // reuse your Redis connection from queue
-    concurrency: 5
+    connection: flowQueue.opts.connection,
+    concurrency: 5,
   }
 );
-
 // --- Listen to events ---
 worker.on("completed", (job) => console.log(`Job ${job.id} fully completed`));
 worker.on("failed", (job, err) => console.error(`Job ${job.id} failed:`, err));

@@ -92,6 +92,7 @@ const initialEdges: Edge[] = [];
 
 export default function Flow({ type }: { type: string }) {
   const { id, loading } = useGlobalContext();
+  const { id, loading } = useGlobalContext();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [isValid, setIsValid] = useState<boolean>(true)
   const [nodes, setNodes] = useState<Node<AIFlowNodeData>[]>(initialNodes);
@@ -215,11 +216,11 @@ export default function Flow({ type }: { type: string }) {
     {
       type: 'MID',
       label: 'LLM',
-      component: <Dropdown label="Select Model" options={['gpt-4', 'gpt-3.5-turbo', 'claude-3', 'llama-2-13b', 'mpt-7b', 'falcon-40b']}/>,
+      component: <Dropdown label="Select Model" options={['gemini-2.5-flash', 'llama3.2:1b']}/>,
     },
     {
       type: 'MID',
-      label: 'toVectorDB',
+      label: 'ToVectorDB',
       component: <Dropdown label="Select DB" options={['Faiss', 'pgvector', 'Pinecone', 'Qdrant (Managed)']} />,
     },
     {
@@ -337,7 +338,7 @@ export default function Flow({ type }: { type: string }) {
       formData.append('file', allFiles[0])
     }
     formData.append('flow', JSON.stringify(flowOrder));
-    formData.append('data', JSON.stringify(nodeInputsMap))
+    formData.append('data', JSON.stringify({ ...nodeInputsMap, userId: id }))
 
     axios.post(`${import.meta.env.VITE_BACKEND_URL}/task/run-flow`, formData, {
       headers: {"Content-Type": "multipart/form-data"}

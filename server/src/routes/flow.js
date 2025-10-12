@@ -11,6 +11,16 @@ import { promises as fs } from "fs";
 
 const router = express.Router();
 
+function dateTimeToCron({ date, time }) {
+  const [year, month, day] = date.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+
+  // Cron format: minute hour day month *
+  return `${minute} ${hour} ${day} ${month} *`;
+}
+
+
+
 async function pdfImg(pdfPath) {
   const outputDir = path.join("uploads", `${path.basename(pdfPath)}_images`);
 
@@ -41,6 +51,7 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
   { key: 'data', type: 'string', required: true }
 ]), async (req, res) => {
   try {
+    console.log("file")
     console.log(req.file)
     let { flow, data } = req.body;
 
@@ -65,6 +76,16 @@ router.post("/run-flow", uploadFiles().single('file'), validateBody([
     }
 
     data.isPdf = false;
+
+    if (!data.Schedule || !Array.isArray(data.Schedule) || data.Schedule.length === 0) {
+      data.start = 0;
+    }
+
+    else{
+      data.start = dateTimeToCron(data['Schedule'][0])
+    }
+    console.log("start time")
+    console.log(data.start)
 
     if (req.file) {
       if (req.file.mimetype === "application/pdf") {
