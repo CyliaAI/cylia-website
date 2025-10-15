@@ -1,7 +1,7 @@
 import { useGlobalContext } from '@/context/GlobalContext';
 import { Mic, Plus, Send, Paperclip, Image, FileText } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import type { FormEvent, KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
 import axios from 'axios';
 
 type MessageType = 'user' | 'bot';
@@ -54,34 +54,34 @@ const Chatbot: React.FC = () => {
     return message;
   };
 
-  const handleSubmit = async (e?: FormEvent<HTMLFormElement | HTMLDivElement>) => {
-    e?.preventDefault();
-    if (!inputValue.trim()) return;
-
-    const userMessage: Message = {
-      id: messages.length + 1,
-      type: 'user',
-      content: inputValue,
-      timestamp: new Date(),
+  const handleSubmit = async (e?: React.SyntheticEvent) => {
+      e?.preventDefault();
+      if (!inputValue.trim()) return;
+  
+      const userMessage: Message = {
+        id: messages.length + 1,
+        type: 'user',
+        content: inputValue,
+        timestamp: new Date(),
+      };
+  
+      setMessages((prev) => [...prev, userMessage]);
+      const currentInput = inputValue;
+      setInputValue('');
+      setIsTyping(true);
+  
+      const botReply = await fetchBotResponse(currentInput);
+  
+      const botMessage: Message = {
+        id: Date.now(),
+        type: 'bot',
+        content: botReply,
+        timestamp: new Date(),
+      };
+  
+      setMessages((prev) => [...prev, botMessage]);
+      setIsTyping(false);
     };
-
-    setMessages((prev) => [...prev, userMessage]);
-    const currentInput = inputValue;
-    setInputValue('');
-    setIsTyping(true);
-
-    const botReply = await fetchBotResponse(currentInput);
-
-    const botMessage: Message = {
-      id: Date.now(),
-      type: 'bot',
-      content: botReply,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, botMessage]);
-    setIsTyping(false);
-  };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

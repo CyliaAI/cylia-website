@@ -25,7 +25,7 @@ import 'reactflow/dist/style.css';
 import Layout from '../components/Layout/Layout';
 import Dropdown from '@/components/Workspace/Dropdown';
 import Chatbot from '@/components/Workspace/Chatbot';
-import { Settings, Save, Play, Download, Trash2, Info, Copy, X } from 'lucide-react';
+import { Settings, Save, Play, Download, Trash2, Copy, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PrivateRoute from '@/router/PrivateRoutes';
 import EmailForm from '@/components/Workspace/EmailForm';
