@@ -1,6 +1,5 @@
 import Layout from '../components/Layout/Layout';
 import Hero from '@/components/Home/Hero';
-import Info from '@/components/Home/Info';
 import HomeAbout from '@/components/Home/HomeAbout';
 
 const Home = () => {
@@ -8,7 +7,6 @@ const Home = () => {
     <Layout>
       <Hero />
       <HomeAbout />
-      <Info />
     </Layout>
   );
 };

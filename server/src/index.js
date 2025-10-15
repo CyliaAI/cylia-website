@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 app.get('/', (req, res) => {
   res.send(`
-    <h2 style="text-align:center">Welcome to the Transfinitte-25 Backend Server ahhh</h2>
+    <h2 style="text-align:center">Welcome to the Transfinitte-25 Backend Server</h2>
   `);
 });
 
