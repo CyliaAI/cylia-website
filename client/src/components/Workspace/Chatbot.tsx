@@ -55,33 +55,33 @@ const Chatbot: React.FC = () => {
   };
 
   const handleSubmit = async (e?: React.SyntheticEvent) => {
-      e?.preventDefault();
-      if (!inputValue.trim()) return;
-  
-      const userMessage: Message = {
-        id: messages.length + 1,
-        type: 'user',
-        content: inputValue,
-        timestamp: new Date(),
-      };
-  
-      setMessages((prev) => [...prev, userMessage]);
-      const currentInput = inputValue;
-      setInputValue('');
-      setIsTyping(true);
-  
-      const botReply = await fetchBotResponse(currentInput);
-  
-      const botMessage: Message = {
-        id: Date.now(),
-        type: 'bot',
-        content: botReply,
-        timestamp: new Date(),
-      };
-  
-      setMessages((prev) => [...prev, botMessage]);
-      setIsTyping(false);
+    e?.preventDefault();
+    if (!inputValue.trim()) return;
+
+    const userMessage: Message = {
+      id: messages.length + 1,
+      type: 'user',
+      content: inputValue,
+      timestamp: new Date(),
     };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
+    setInputValue('');
+    setIsTyping(true);
+
+    const botReply = await fetchBotResponse(currentInput);
+
+    const botMessage: Message = {
+      id: Date.now(),
+      type: 'bot',
+      content: botReply,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, botMessage]);
+    setIsTyping(false);
+  };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

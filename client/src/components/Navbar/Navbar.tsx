@@ -18,7 +18,7 @@ const Navbar = () => {
       setDropdown(false);
       context.setId(null);
       context.setEmail(null);
-      context.setName("")
+      context.setName('');
       context.setIsLoggedIn(false);
       navigate('/');
     } catch (err) {
