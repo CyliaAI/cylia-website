@@ -9,9 +9,9 @@ const prisma = new PrismaClient();
 
 const router = Router();
 
-const CLIENT = process.env.CLIENT;
-const SECRET = process.env.SECRET;
-const PASS = process.env.PASS;
+const CLIENT = process.env.GOOGLE_CLIENT;
+const SECRET = process.env.GOOGLE_SECRET;
+const PASS = process.env.GOOGLE_PASS;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 
 const getToken = (id, name, email, role) => {
