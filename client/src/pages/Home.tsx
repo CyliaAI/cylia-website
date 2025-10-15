@@ -1,16 +1,16 @@
-import Layout from "../components/Layout/Layout";
-import Hero from "@/components/Home/Hero";
-import Info from "@/components/Home/Info";
-import HomeAbout from "@/components/Home/HomeAbout";
+import Layout from '../components/Layout/Layout';
+import Hero from '@/components/Home/Hero';
+import Info from '@/components/Home/Info';
+import HomeAbout from '@/components/Home/HomeAbout';
 
 const Home = () => {
-    return (
-      <Layout>
-        <Hero />
-        <HomeAbout/>
-        <Info/>
-      </Layout>
-    );
+  return (
+    <Layout>
+      <Hero />
+      <HomeAbout />
+      <Info />
+    </Layout>
+  );
 };
 
 export default Home;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { useDebounce } from "use-debounce";
-import { GlobalContext } from "../../context/GlobalContext";
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { useDebounce } from 'use-debounce';
+import { GlobalContext } from '../../context/GlobalContext';
 
 interface ViewteamProps {
   team: {
@@ -14,22 +14,26 @@ interface ViewteamProps {
 }
 
 export const ViewTeam: React.FC<ViewteamProps> = ({ team, onClose }) => {
-  const [search, setSearch] = useState("");               
-  const [debouncedSearch] = useDebounce(search, 500); 
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 500);
   const teamId = team.members[0]?.teamId;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [userResults, setUserResults] = useState<any>(null); 
-  const {id} = useContext(GlobalContext);
+  const [userResults, setUserResults] = useState<any>(null);
+  const { id } = useContext(GlobalContext);
 
   useEffect(() => {
-    if (debouncedSearch.trim() === "") {
+    if (debouncedSearch.trim() === '') {
       setUserResults([]);
       return;
     }
 
     const fetchUsers = async () => {
       try {
-        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/find`,{ search: debouncedSearch },{ withCredentials: true });
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/users/find`,
+          { search: debouncedSearch },
+          { withCredentials: true },
+        );
         setUserResults(res.data.users || []);
       } catch (err) {
         console.error(err);
@@ -40,30 +44,26 @@ export const ViewTeam: React.FC<ViewteamProps> = ({ team, onClose }) => {
     fetchUsers();
   }, [id, debouncedSearch]);
 
-  const handleAddMember = async(user: any) => {
-    try{
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/add-team-member`,{teamId,userId:user.id},{withCredentials:true})
-    }
-    catch(err){
-
-    }
-    setSearch("");
+  const handleAddMember = async (user: any) => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/workspaces/add-team-member`,
+        { teamId, userId: user.id },
+        { withCredentials: true },
+      );
+    } catch (err) {}
+    setSearch('');
     setUserResults([]);
   };
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
 
       <div className="fixed top-1/2 left-1/2 z-50 w-96 bg-gray-800 p-6 rounded-2xl shadow-xl -translate-x-1/2 -translate-y-1/2">
         <h2 className="text-2xl font-bold text-indigo-300 mb-2">{team.name}</h2>
         <p className="text-gray-400 mb-4">{team.description}</p>
-        <p className="text-gray-300 font-medium mb-4">
-          Members: {team.members.length || 0}
-        </p>
+        <p className="text-gray-300 font-medium mb-4">Members: {team.members.length || 0}</p>
 
         <div className="mb-4">
           <label className="block text-gray-300 mb-1">Add Member</label>
@@ -76,9 +76,7 @@ export const ViewTeam: React.FC<ViewteamProps> = ({ team, onClose }) => {
           />
 
           {debouncedSearch && userResults.length === 0 && (
-            <div className="mt-2 text-gray-400 text-sm italic">
-              No users found
-            </div>
+            <div className="mt-2 text-gray-400 text-sm italic">No users found</div>
           )}
 
           {userResults && userResults.length > 0 && (

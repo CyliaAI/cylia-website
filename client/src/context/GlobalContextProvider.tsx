@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { GlobalContext } from "./GlobalContext";
-import type { GlobalContextType } from "./GlobalContext";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { GlobalContext } from './GlobalContext';
+import type { GlobalContextType } from './GlobalContext';
+import axios from 'axios';
 
 type ContainerProps = {
   children: React.ReactNode;
@@ -24,12 +24,10 @@ export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) =>
         setId(resp.data.user.id || null);
         setEmail(resp.data.user.email || null);
         setName(resp.data.user.name || null);
-      } 
-	    catch (err) {
+      } catch (err) {
         console.error(err);
         setIsLoggedIn(false);
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -46,7 +44,7 @@ export const GlobalContextProvider: React.FC<ContainerProps> = ({ children }) =>
     name,
     setName,
     loading,
-    setLoading
+    setLoading,
   };
 
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;

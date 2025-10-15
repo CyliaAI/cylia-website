@@ -1,53 +1,51 @@
-import  { useState } from "react";
-import Editor, {  loader } from "@monaco-editor/react";
-import axios from "axios";
+import { useState } from 'react';
+import Editor, { loader } from '@monaco-editor/react';
+import axios from 'axios';
 
-loader.init().then(monaco => {
+loader.init().then((monaco) => {
   // You can configure themes, languages here if needed
-    monaco.editor.setTheme("vs-dark");
-    
+  monaco.editor.setTheme('vs-dark');
 });
 
-type Language = "javascript" | "python" | "typescript" | "cpp";
+type Language = 'javascript' | 'python' | 'typescript' | 'cpp';
 
 function CodeEditor() {
-  const [code, setCode] = useState<string>("");       // user code
-  const [input, setInput] = useState<string>("");     // input for code
-  const [language, setLanguage] = useState<Language>("javascript");
-  const [output, setOutput] = useState<string>("");
-    const getInput=()=>{
-        // Fetch input from backend if needed
-        console.log("Fetching input from backend...");
-        return "try to find a way to use it or else remove it.But backend need input thing"
-    }
-    const handleRun = async () => {
+  const [code, setCode] = useState<string>(''); // user code
+  const [input, setInput] = useState<string>(''); // input for code
+  const [language, setLanguage] = useState<Language>('javascript');
+  const [output, setOutput] = useState<string>('');
+  const getInput = () => {
+    // Fetch input from backend if needed
+    console.log('Fetching input from backend...');
+    return 'try to find a way to use it or else remove it.But backend need input thing';
+  };
+  const handleRun = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/customNode/run-code", {
+      const response = await axios.post('http://localhost:8000/customNode/run-code', {
         userId: 4,
-        codeName: "test1",
-        input:" ",
+        codeName: 'test1',
+        input: ' ',
       });
 
       setOutput(JSON.stringify(response.data.output));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setOutput("Error running code");
+      setOutput('Error running code');
     }
   };
 
   const handleSave = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/customNode/save-code", {
-        userId: 4,         // Example userId, replace dynamically
-        codeName: "test1", // Example codeName, replace dynamically
-        code,             // pass input to backend
+      const response = await axios.post('http://localhost:8000/customNode/save-code', {
+        userId: 4, // Example userId, replace dynamically
+        codeName: 'test1', // Example codeName, replace dynamically
+        code, // pass input to backend
       });
-      console.log("Code saved successfully:", response.data);
+      console.log('Code saved successfully:', response.data);
       setOutput(JSON.stringify(response.data.customCode.code));
       handleRun();
-    } catch  {
-      
-      setOutput( "Error running code");
+    } catch {
+      setOutput('Error running code');
     }
   };
 
@@ -75,11 +73,11 @@ function CodeEditor() {
         theme="vs-dark"
         language={language}
         value={code}
-        onChange={(value) => setCode(value || "")}
+        onChange={(value) => setCode(value || '')}
         options={{
           fontSize: 16,
           minimap: { enabled: false },
-          wordWrap: "on",
+          wordWrap: 'on',
           automaticLayout: true,
         }}
       />

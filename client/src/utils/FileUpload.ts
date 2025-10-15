@@ -5,31 +5,30 @@ export async function selectAndUploadFile(uploadUrl: string): Promise<{
   error?: string;
 }> {
   return new Promise((resolve) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.style.display = "none";
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.style.display = 'none';
     document.body.appendChild(input);
 
     input.onchange = async () => {
       if (!input.files || input.files.length === 0) {
         document.body.removeChild(input);
-        return resolve({ success: false, error: "No file selected" });
+        return resolve({ success: false, error: 'No file selected' });
       }
 
       const file = input.files[0];
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
       try {
         const res = await fetch(uploadUrl, {
-          method: "POST",
+          method: 'POST',
           body: formData,
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         resolve({ success: true, fileName: file.name });
-      } catch  {
-        
+      } catch {
         resolve({ success: false });
       } finally {
         document.body.removeChild(input);

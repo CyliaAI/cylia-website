@@ -1,5 +1,5 @@
-import { promises as fs } from "node:fs";
-import { pdf } from "pdf-to-img";
+import { promises as fs } from 'node:fs';
+import { pdf } from 'pdf-to-img';
 
 async function pdfImg(path) {
   let counter = 1;

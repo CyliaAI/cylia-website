@@ -9,7 +9,15 @@ import ReactFlow, {
   Background,
   MiniMap,
 } from 'reactflow';
-import type { Node, Edge, NodeChange, EdgeChange, Connection, ReactFlowInstance, XYPosition } from 'reactflow';
+import type {
+  Node,
+  Edge,
+  NodeChange,
+  EdgeChange,
+  Connection,
+  ReactFlowInstance,
+  XYPosition,
+} from 'reactflow';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import LZString from 'lz-string';
@@ -37,7 +45,7 @@ interface AIFlowNodeData {
 }
 
 interface NodeInputValues {
-  [label: string]: any[];
+  [label: string]: unknown[];
 }
 
 type NodeType = {
@@ -47,42 +55,42 @@ type NodeType = {
 };
 
 const styleMap: Record<string, React.CSSProperties> = {
-  MID: { 
-    color: '#fff', 
-    borderWidth: '3px 1px 1px 1px', 
-    borderStyle: 'solid', 
-    borderColor: '#06b6d4', 
-    borderRadius: 8, 
-    padding: '12px 20px', 
-    fontWeight: 'bold', 
+  MID: {
+    color: '#fff',
+    borderWidth: '3px 1px 1px 1px',
+    borderStyle: 'solid',
+    borderColor: '#06b6d4',
+    borderRadius: 8,
+    padding: '12px 20px',
+    fontWeight: 'bold',
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
     textAlign: 'center',
-    backdropFilter: 'blur(4px)'
+    backdropFilter: 'blur(4px)',
   },
-  END: { 
-    color: '#fff', 
-    borderWidth: '3px 1px 1px 1px', 
-    borderStyle: 'solid', 
-    borderColor: '#FF5858', 
-    borderRadius: 8, 
-    padding: '12px 18px', 
-    fontStyle: 'italic', 
+  END: {
+    color: '#fff',
+    borderWidth: '3px 1px 1px 1px',
+    borderStyle: 'solid',
+    borderColor: '#FF5858',
+    borderRadius: 8,
+    padding: '12px 18px',
+    fontStyle: 'italic',
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
     textAlign: 'center',
-    backdropFilter: 'blur(4px)'
+    backdropFilter: 'blur(4px)',
   },
-  BEGIN: { 
-    color: '#fff', 
-    borderWidth: '3px 1px 1px 1px', 
-    borderStyle: 'solid', 
-    borderColor: '#6EFF7F', 
-    borderRadius: 8, 
-    padding: '12px 18px', 
-    fontFamily: 'monospace', 
-    fontWeight: '600', 
+  BEGIN: {
+    color: '#fff',
+    borderWidth: '3px 1px 1px 1px',
+    borderStyle: 'solid',
+    borderColor: '#6EFF7F',
+    borderRadius: 8,
+    padding: '12px 18px',
+    fontFamily: 'monospace',
+    fontWeight: '600',
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
     textAlign: 'center',
-    backdropFilter: 'blur(4px)'
+    backdropFilter: 'blur(4px)',
   },
 };
 
@@ -96,20 +104,22 @@ const initialEdges: Edge[] = [];
 export default function Flow({ type }: { type: string }) {
   const { id, loading } = useGlobalContext();
   const { workspaceId } = useParams<{ workspaceId: string }>();
-  const [isValid, setIsValid] = useState<boolean>(true)
+  const [isValid, setIsValid] = useState<boolean>(true);
   const [nodes, setNodes] = useState<Node<AIFlowNodeData>[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const [nodeInputValues, setNodeInputValues] = useState<NodeInputValues>({});
   const [flowOrder, setFlowOrder] = useState<string[]>([]);
-  const [nodeInputsMap, setNodeInputsMap] = useState<Record<string, any[]>>({});
+  const [nodeInputsMap, setNodeInputsMap] = useState<Record<string, unknown[]>>({});
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
-  const onNodesChange = (changes: NodeChange[]) => setNodes(nds => applyNodeChanges(changes, nds));
-  const onEdgesChange = (changes: EdgeChange[]) => setEdges(eds => applyEdgeChanges(changes, eds));
-  const onConnect = (connection: Connection) => setEdges(eds => addEdge(connection, eds));
+  const onNodesChange = (changes: NodeChange[]) =>
+    setNodes((nds) => applyNodeChanges(changes, nds));
+  const onEdgesChange = (changes: EdgeChange[]) =>
+    setEdges((eds) => applyEdgeChanges(changes, eds));
+  const onConnect = (connection: Connection) => setEdges((eds) => addEdge(connection, eds));
 
-  const [uploaded, setUploaded] = useState(false)
+  const [uploaded, setUploaded] = useState(false);
   const [exportPop, setExportPop] = useState<boolean>(false);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, label: string, type: string) => {
@@ -136,10 +146,6 @@ export default function Flow({ type }: { type: string }) {
     Cookies.set('myFlow', compressed, { expires: 7 });
   };
 
-  function getNodeByLabel(label: string) {
-    return nodes.find((n) => n.data.label === label);
-  }
-
   const saveFlowToDB = (nodes: Node<AIFlowNodeData>[], edges: Edge[]) => {
     const serializableNodes = nodes.map(({ id, type, position, data, style }) => ({
       id,
@@ -153,16 +159,19 @@ export default function Flow({ type }: { type: string }) {
       },
     }));
 
-    const workflow = { nodes: serializableNodes, edges }
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/save-workflow`, {workspaceId: Number(workspaceId), workflow})
-    .then(res => {
-      console.log(res);
-      toast.success("Workflow has been successfully saved");
-    })
-    .catch(err => {
-      console.error(err);
-    })
-  }
+    const workflow = { nodes: serializableNodes, edges };
+    axios
+      .post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/save-workflow`, {
+        workspaceId: Number(workspaceId),
+        workflow,
+      })
+      .then(() => {
+        toast.success('Workflow has been successfully saved');
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const loadFlowFromCookie = () => {
     const compressed = Cookies.get('myFlow');
@@ -186,7 +195,7 @@ export default function Flow({ type }: { type: string }) {
     const { type, label } = JSON.parse(reactFlowData);
     if (!type || !label) return;
 
-    const nodeTypeItem = nodeTypesList.find(n => n.label === label && n.type === type);
+    const nodeTypeItem = nodeTypesList.find((n) => n.label === label && n.type === type);
     if (!nodeTypeItem) return;
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
@@ -208,7 +217,7 @@ export default function Flow({ type }: { type: string }) {
       style: { background: 'transparent', border: '0px' },
     };
 
-    setNodes(nds => nds.concat(newNode));
+    setNodes((nds) => nds.concat(newNode));
   };
 
   const onDragOver = (event: React.DragEvent<HTMLDivElement>) => event.preventDefault();
@@ -217,17 +226,17 @@ export default function Flow({ type }: { type: string }) {
     {
       type: 'BEGIN',
       label: 'Document',
-      component: <UploadBox  />,
+      component: <UploadBox />,
     },
     {
       type: 'MID',
       label: 'LLM',
-      component: <Dropdown label="Select Model" options={['gemini-2.5-flash', 'llama3.2:1b']}/>,
+      component: <Dropdown label="Select Model" options={['gemini-2.5-flash', 'llama3.2:1b']} />,
     },
     {
       type: 'MID',
       label: 'ToVectorDB',
-      component: <Dropdown label="Select DB" options={['Faiss', 'pgvector', 'Pinecone', 'Qdrant (Managed)']} />,
+      component: <Dropdown label="Select DB" options={['Faiss', 'Pinecone']} />,
     },
     {
       type: 'MID',
@@ -237,7 +246,11 @@ export default function Flow({ type }: { type: string }) {
     {
       type: 'END',
       label: 'FiletoText',
-      component: <div className="text-[6px] text-gray-400 font-semibold">This will convert the inserted document node into text and produce it to the next node</div>,
+      component: (
+        <div className="text-[6px] text-gray-400 font-semibold">
+          This will convert the inserted document node into text and produce it to the next node
+        </div>
+      ),
     },
     {
       type: 'END',
@@ -252,7 +265,9 @@ export default function Flow({ type }: { type: string }) {
   ];
 
   const nodeTypeMap: Record<string, NodeType> = {};
-  nodeTypesList.forEach((n) => { nodeTypeMap[n.label] = n; });
+  nodeTypesList.forEach((n) => {
+    nodeTypeMap[n.label] = n;
+  });
 
   const DefaultNode = ({ data }: { data: AIFlowNodeData }) => {
     const bgMap: Record<string, string> = {
@@ -266,12 +281,12 @@ export default function Flow({ type }: { type: string }) {
     const renderedComponent = React.isValidElement(component)
       ? React.cloneElement(component as React.ReactElement<any>, {
           nodeLabel: data.label,
-          onValueChange: (label: string, value: any) => {
+          onValueChange: (label: string, value: unknown) => {
             setNodeInputValues((prev) => ({
               ...prev,
               [label]: [...(prev[label] || []), value],
             }));
-            if (label == "Document") {
+            if (label == 'Document') {
               setUploaded(true);
             }
           },
@@ -281,14 +296,20 @@ export default function Flow({ type }: { type: string }) {
     return (
       <div
         style={{ position: 'relative', ...data.style }}
-        className={`${bgMap[data.type]} ${
-          data.label === 'Start' || data.label === 'Output' ? 'w-full min-w-[120px]' : 'w-fit min-w-[140px]'
+        className={`${bgMap[data.type ?? 'MID']} ${
+          data.label === 'Start' || data.label === 'Output'
+            ? 'w-full min-w-[120px]'
+            : 'w-fit min-w-[140px]'
         } font-poppins`}
       >
-        {data.label !== 'Start' && <Handle type="target" position={Position.Left} className="w-3 h-3" />}
+        {data.label !== 'Start' && (
+          <Handle type="target" position={Position.Left} className="w-3 h-3" />
+        )}
         <div className="text-[10px] my-2 font-semibold tracking-wide">{data.label}</div>
         <div>{renderedComponent}</div>
-        {data.label !== 'Output' && <Handle type="source" position={Position.Right} className="w-3 h-3" />}
+        {data.label !== 'Output' && (
+          <Handle type="source" position={Position.Right} className="w-3 h-3" />
+        )}
       </div>
     );
   };
@@ -335,44 +356,42 @@ export default function Flow({ type }: { type: string }) {
   }
 
   const handleSubmit = () => {
-    console.log("Flow Order:", flowOrder);
-    console.log("Node Inputs:", nodeInputsMap);
     const formData = new FormData();
-    console.log(uploaded)
     if (uploaded) {
-      const allFiles = (nodeInputsMap.Document || []).filter(f => f instanceof File);
-      formData.append('file', allFiles[0])
+      const allFiles = (nodeInputsMap.Document || []).filter((f) => f instanceof File);
+      formData.append('file', allFiles[0]);
     }
     formData.append('flow', JSON.stringify(flowOrder));
-    formData.append('data', JSON.stringify({ ...nodeInputsMap, userId: id }))
+    formData.append('data', JSON.stringify({ ...nodeInputsMap, userId: id }));
 
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/task/run-flow`, formData, {
-      headers: {"Content-Type": "multipart/form-data"}
-    })
-    .then(response => {
-      console.log('Flow submitted successfully:', response.data);
-    })
-    .catch(error => {
-      console.error('Error submitting flow:', error);
-    });
-    toast.success("Flow submitted! Check console for details.");
+    axios
+      .post(`${import.meta.env.VITE_BACKEND_URL}/task/run-flow`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then((response) => {
+        console.log('Flow submitted successfully:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error submitting flow:', error);
+      });
+    toast.success('Flow submitted! Check console for details.');
   };
 
   const handleClear = () => {
     setNodes(initialNodes);
     setEdges(initialEdges);
     setNodeInputValues({});
-    toast.success("Canvas cleared!");
+    toast.success('Canvas cleared!');
   };
 
   const exportAsText = () => {
     const data = { nodes, edges };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "text/plain" });
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement("a");
+
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "graph_data.txt";
+    a.download = 'graph_data.txt';
     a.click();
 
     setExportPop(false);
@@ -384,10 +403,10 @@ export default function Flow({ type }: { type: string }) {
     const data = { nodes, edges };
     try {
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-      toast.success("Copied to clipboard!");
+      toast.success('Copied to clipboard!');
       setExportPop(false);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      console.error('Failed to copy:', err);
     }
   };
 
@@ -396,12 +415,11 @@ export default function Flow({ type }: { type: string }) {
     setFlowOrder(order);
   }, [nodes, edges]);
 
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Delete') {
-        setNodes(nds => nds.filter(n => !n.selected));
-        setEdges(eds => eds.filter(e => !e.selected));
+        setNodes((nds) => nds.filter((n) => !n.selected));
+        setEdges((eds) => eds.filter((e) => !e.selected));
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -414,7 +432,7 @@ export default function Flow({ type }: { type: string }) {
     const order = getFlowOrder(nodes, edges);
     setFlowOrder(order);
 
-    const orderedInputs: Record<string, any[]> = {};
+    const orderedInputs: Record<string, unknown[]> = {};
     order.forEach((label) => {
       if (nodeInputValues[label]) {
         orderedInputs[label] = nodeInputValues[label];
@@ -424,10 +442,13 @@ export default function Flow({ type }: { type: string }) {
     setNodeInputsMap(orderedInputs);
   }, [nodes, edges, nodeInputValues]);
 
-
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/${type == "personal" ? "get-workflow" : "get-team-workflow"}`, type == "personal" ? {workspaceId: Number(workspaceId)} : {teamId: Number(workspaceId)})
-      .then(res => {
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URL}/workspaces/${type == 'personal' ? 'get-workflow' : 'get-team-workflow'}`,
+        type == 'personal' ? { workspaceId: Number(workspaceId) } : { teamId: Number(workspaceId) },
+      )
+      .then((res) => {
         const flow = loadFlowFromCookie();
         if (flow.nodes.length > 0) {
           if (flow.id === id && flow.workspaceId == workspaceId && flow.type === type) {
@@ -445,10 +466,10 @@ export default function Flow({ type }: { type: string }) {
           toast.success('DB flow loaded');
         }
       })
-      .catch(err => {
+      .catch((err) => {
         setIsValid(false);
         console.error(err);
-      })
+      });
   }, [loading]);
 
   useEffect(() => {
@@ -458,23 +479,26 @@ export default function Flow({ type }: { type: string }) {
 
   return (
     <Layout showFooter={false}>
-      {!isValid && <Navigate to="/not-found"/>}
+      {!isValid && <Navigate to="/not-found" />}
       {exportPop && (
-        <div className='min-h-screen w-full fixed bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center'>
+        <div className="min-h-screen w-full fixed bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center">
           <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-lg w-full mx-4">
-            <div className='justify-between flex'>
+            <div className="justify-between flex">
               <h2 className="text-2xl font-bold text-white mb-4">Export Workflow</h2>
-              <button onClick={() => setExportPop(false)} className='bg-red-400 rounded-2xl px-3'><X size={18}/></button>
+              <button onClick={() => setExportPop(false)} className="bg-red-400 rounded-2xl px-3">
+                <X size={18} />
+              </button>
             </div>
             <p className="text-gray-300 mb-6">Download your workflow configuration</p>
             <div className="flex gap-3">
-              <button 
+              <button
                 onClick={copyToClipboard}
                 className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <Copy size={18}/>Copy to clipboard
+                <Copy size={18} />
+                Copy to clipboard
               </button>
-              <button 
+              <button
                 onClick={exportAsText}
                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-all duration-200 flex items-center justify-center gap-2"
               >
@@ -500,24 +524,24 @@ export default function Flow({ type }: { type: string }) {
 
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2 bg-blue-500/10 rounded-lg border border-blue-500/20"></div>
-              
+
               <div className="flex items-center gap-3">
-                <button 
+                <button
                   onClick={() => saveFlowToDB(nodes, edges)}
                   className="flex items-center gap-2 bg-gray-700/50 text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-200 border border-gray-600/50"
                 >
                   <Save size={18} />
                   <span className="hidden sm:inline">Save</span>
                 </button>
-                <button 
+                <button
                   onClick={handleClear}
                   className="flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/20 transition-all duration-200 border border-red-500/30"
                 >
                   <Trash2 size={18} />
                   <span className="hidden sm:inline">Clear</span>
                 </button>
-                <button 
-                  onClick={() => setExportPop(true)} 
+                <button
+                  onClick={() => setExportPop(true)}
                   className="flex items-center gap-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-lg hover:bg-green-500/20 transition-all duration-200 border border-green-500/30"
                 >
                   <Download size={18} />
@@ -540,51 +564,63 @@ export default function Flow({ type }: { type: string }) {
               </h3>
               <p className="text-xs text-gray-400 ml-3">Drag to canvas to add</p>
             </div>
-            
+
             <div className="space-y-3">
               <div>
-                <div className="text-xs font-semibold text-green-400 mb-2 uppercase tracking-wider">Inputs</div>
-                {nodeTypesList.filter(n => n.type === 'BEGIN').map((node) => (
-                  <div 
-                    key={node.label} 
-                    draggable 
-                    onDragStart={(e) => onDragStart(e, node.label, node.type)} 
-                    style={{ position: 'relative', ...styleMap[node.type] }} 
-                    className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
-                  >
-                    <div className="text-[10px] font-semibold">{node.label}</div>
-                  </div>
-                ))}
+                <div className="text-xs font-semibold text-green-400 mb-2 uppercase tracking-wider">
+                  Inputs
+                </div>
+                {nodeTypesList
+                  .filter((n) => n.type === 'BEGIN')
+                  .map((node) => (
+                    <div
+                      key={node.label}
+                      draggable
+                      onDragStart={(e) => onDragStart(e, node.label, node.type)}
+                      style={{ position: 'relative', ...styleMap[node.type] }}
+                      className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
+                    >
+                      <div className="text-[10px] font-semibold">{node.label}</div>
+                    </div>
+                  ))}
               </div>
 
               <div>
-                <div className="text-xs font-semibold text-cyan-400 mb-2 uppercase tracking-wider">Processing</div>
-                {nodeTypesList.filter(n => n.type === 'MID').map((node) => (
-                  <div 
-                    key={node.label} 
-                    draggable 
-                    onDragStart={(e) => onDragStart(e, node.label, node.type)} 
-                    style={{ position: 'relative', ...styleMap[node.type] }} 
-                    className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
-                  >
-                    <div className="text-[10px] font-semibold">{node.label}</div>
-                  </div>
-                ))}
+                <div className="text-xs font-semibold text-cyan-400 mb-2 uppercase tracking-wider">
+                  Processing
+                </div>
+                {nodeTypesList
+                  .filter((n) => n.type === 'MID')
+                  .map((node) => (
+                    <div
+                      key={node.label}
+                      draggable
+                      onDragStart={(e) => onDragStart(e, node.label, node.type)}
+                      style={{ position: 'relative', ...styleMap[node.type] }}
+                      className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
+                    >
+                      <div className="text-[10px] font-semibold">{node.label}</div>
+                    </div>
+                  ))}
               </div>
 
               <div>
-                <div className="text-xs font-semibold text-red-400 mb-2 uppercase tracking-wider">Outputs</div>
-                {nodeTypesList.filter(n => n.type === 'END').map((node) => (
-                  <div 
-                    key={node.label} 
-                    draggable 
-                    onDragStart={(e) => onDragStart(e, node.label, node.type)} 
-                    style={{ position: 'relative', ...styleMap[node.type] }} 
-                    className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
-                  >
-                    <div className="text-[10px] font-semibold">{node.label}</div>
-                  </div>
-                ))}
+                <div className="text-xs font-semibold text-red-400 mb-2 uppercase tracking-wider">
+                  Outputs
+                </div>
+                {nodeTypesList
+                  .filter((n) => n.type === 'END')
+                  .map((node) => (
+                    <div
+                      key={node.label}
+                      draggable
+                      onDragStart={(e) => onDragStart(e, node.label, node.type)}
+                      style={{ position: 'relative', ...styleMap[node.type] }}
+                      className="backdrop-blur-sm font-poppins cursor-move hover:scale-105 transition-transform mb-2"
+                    >
+                      <div className="text-[10px] font-semibold">{node.label}</div>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -605,17 +641,17 @@ export default function Flow({ type }: { type: string }) {
               noDragClassName="nodrag"
               defaultEdgeOptions={{
                 animated: true,
-                style: { stroke: '#6EFF7F', strokeWidth: 2 }
+                style: { stroke: '#6EFF7F', strokeWidth: 2 },
               }}
             >
               <Controls className="bg-gray-800/90 border border-gray-700 rounded-lg" />
-              <MiniMap 
-                className="bg-gray-900/90 border border-gray-700 rounded-lg" 
+              <MiniMap
+                className="bg-gray-900/90 border border-gray-700 rounded-lg"
                 nodeColor={(node) => {
                   const typeColors = {
                     BEGIN: '#6EFF7F',
                     MID: '#06b6d4',
-                    END: '#FF5858'
+                    END: '#FF5858',
                   };
                   return typeColors[node.data.type as keyof typeof typeColors] || '#999';
                 }}
@@ -634,9 +670,9 @@ export default function Flow({ type }: { type: string }) {
                 <span className="font-semibold text-gray-300">{edges.length}</span> connections
               </div>
             </div>
-            
-            <button 
-              onClick={handleSubmit} 
+
+            <button
+              onClick={handleSubmit}
               className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 font-semibold text-white px-6 py-3 text-lg rounded-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Play size={20} />

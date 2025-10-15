@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface EmailFormProps {
   nodeLabel?: string;
@@ -24,7 +24,7 @@ export default function EmailForm({ nodeLabel, onValueChange }: EmailFormProps) 
         type="text"
         placeholder="Email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         onBlur={handleBlur}
         className="text-[8px]"
       />
@@ -32,7 +32,7 @@ export default function EmailForm({ nodeLabel, onValueChange }: EmailFormProps) 
         type="text"
         placeholder="Subject"
         value={subject}
-        onChange={e => setSubject(e.target.value)}
+        onChange={(e) => setSubject(e.target.value)}
         onBlur={handleBlur}
         className="text-[8px]"
       />

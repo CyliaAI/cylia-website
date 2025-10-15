@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface UploadBoxProps {
   nodeLabel?: string;
@@ -24,7 +24,7 @@ export default function UploadBox({ nodeLabel, onValueChange }: UploadBoxProps) 
         htmlFor={`upload-${nodeLabel}`}
         className="cursor-pointer px-3 py-1 bg-white/90 backdrop-blur-md border border-gray-300 rounded-sm shadow-sm text-gray-700 hover:bg-cyan-100 hover:text-cyan-700 transition-all duration-200"
       >
-        {file ? file.name : "Upload File"}
+        {file ? file.name : 'Upload File'}
       </label>
 
       <input

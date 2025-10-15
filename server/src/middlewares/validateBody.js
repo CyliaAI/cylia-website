@@ -35,4 +35,4 @@ function validateBody(rules) {
   };
 }
 
-export default validateBody
+export default validateBody;

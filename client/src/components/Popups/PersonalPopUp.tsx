@@ -1,33 +1,33 @@
-import { useState } from "react";
-import axios from "axios";
-import { useContext } from "react";
-import { GlobalContext } from "../../context/GlobalContext";
+import { useState } from 'react';
+import axios from 'axios';
+import { useContext } from 'react';
+import { GlobalContext } from '../../context/GlobalContext';
 
 interface PopupTeamProps {
   onClose: () => void;
 }
 
 export const PersonalPopUp: React.FC<PopupTeamProps> = ({ onClose }) => {
-  const [name, setname] = useState("");
-  const [Desc, setDesc] = useState("");
-  const {id} = useContext(GlobalContext);
-  const handleSave = async() => {
-    try{
-        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/workspaces/create-personal-workspace`,{name:name,description:Desc,userId:id},{withCredentials:true})
-        onClose();
-        window.location.reload();
-    }
-    catch(err){
-        console.log(err);
+  const [name, setname] = useState('');
+  const [Desc, setDesc] = useState('');
+  const { id } = useContext(GlobalContext);
+  const handleSave = async () => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/workspaces/create-personal-workspace`,
+        { name: name, description: Desc, userId: id },
+        { withCredentials: true },
+      );
+      onClose();
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
 
       <div className="fixed top-1/2 left-1/2 z-50 w-96 bg-gray-800 p-6 rounded-2xl shadow-xl -translate-x-1/2 -translate-y-1/2">
         <h2 className="text-xl font-bold text-white mb-4">Create New Workspace</h2>

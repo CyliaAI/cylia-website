@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface RAGProps {
   nodeLabel?: string;
@@ -23,7 +23,7 @@ export default function RAGInput({ nodeLabel, onValueChange }: RAGProps) {
         type="text"
         placeholder="Summary"
         value={query}
-        onChange={e => setQuery(e.target.value)}
+        onChange={(e) => setQuery(e.target.value)}
         onBlur={handleBlur}
         className="text-[8px]"
       />

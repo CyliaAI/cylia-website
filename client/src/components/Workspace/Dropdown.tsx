@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface DropdownProps {
   label: string;
@@ -7,12 +7,7 @@ interface DropdownProps {
   onValueChange?: (nodeLabel: string, value: string) => void;
 }
 
-export default function Dropdown({
-  label,
-  options,
-  nodeLabel,
-  onValueChange,
-}: DropdownProps) {
+export default function Dropdown({ label, options, nodeLabel, onValueChange }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -32,13 +27,11 @@ export default function Dropdown({
                    bg-white/90 backdrop-blur-md border border-gray-300 
                    rounded-sm shadow-sm hover:shadow-md transition-all duration-200"
       >
-        <span className="truncate text-gray-600 font-medium text-[6px]">
-          {selected || label}
-        </span>
+        <span className="truncate text-gray-600 font-medium text-[6px]">{selected || label}</span>
 
         <span
           className={`ml-2 transform text-[8px] transition-transform ${
-            isOpen ? "rotate-180" : "rotate-0"
+            isOpen ? 'rotate-180' : 'rotate-0'
           }`}
         >
           ▼

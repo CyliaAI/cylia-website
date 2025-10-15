@@ -1,11 +1,5 @@
-
-
 const App = () => {
-  return (
-    <div className='h-screen bg-black'>
-      
-    </div>
-  )
-}
+  return <div className="h-screen bg-black"></div>;
+};
 
-export default App
+export default App;
