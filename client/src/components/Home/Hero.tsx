@@ -65,7 +65,7 @@ const Hero = () => {
 
   return (
     <section className="relative">
-      <div className="bg-[url(./bg-cook.jpeg)] bg-cover bg-center h-[80vh] z-0"></div>
+      <div className="bg-[url(https://cylia.vercel.app/bg-cook.jpeg)] bg-cover bg-center h-[80vh] z-0"></div>
       <div className="absolute top-0 left-0 w-full flex h-full bg-linear-270 from-black/50 via-50% to-emerald-600">
         <div className="flex z-[1] font-poppins gap-10 text-neutral-200 pl-4 pt-[15vh] relative">
           {heroSections.map((elem, i) => (
