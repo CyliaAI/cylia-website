@@ -1,13 +1,6 @@
 version: "3.9"
 
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: tf_redis
-    restart: always
-    networks:
-      - backend
-
   api:
     build: .
     container_name: tf_api
@@ -18,25 +11,12 @@ services:
       - "8000:8000"
     volumes:
       - ./uploads:/app/uploads
-    depends_on:
-      redis:
-        condition: service_started
-    networks:
-      - backend
 
   worker:
     build: .
     container_name: tf_worker
-    command: npx nodemon dist/workers/flowWorker.js
+    command: node dist/workers/flowWorker.js
     env_file:
       - .env
     volumes:
       - ./uploads:/app/uploads
-    depends_on:
-      - redis
-    networks:
-      - backend
-
-networks:
-  backend:
-    driver: bridge

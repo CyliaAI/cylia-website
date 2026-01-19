@@ -23,7 +23,7 @@ router.get('/google', async (req, res) => {
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
     ].join(' ');
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT}&redirect_uri=${encodeURIComponent('http://localhost:8000/auth/google/callback')}&scope=${scope}&access_type=offline&prompt=consent`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT}&redirect_uri=${GOOGLE_REDIRECT_URI}&scope=${scope}&access_type=offline&prompt=consent`;
     res.redirect(authUrl);
   } catch (err) {
     console.error(err);
