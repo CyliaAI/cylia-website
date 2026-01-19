@@ -12,6 +12,7 @@ const router = Router();
 const CLIENT = process.env.GOOGLE_CLIENT;
 const SECRET = process.env.GOOGLE_SECRET;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const getToken = (id, name, email, role) => {
   return jwt.sign({ id, name, email, role }, SECRET);
@@ -65,7 +66,7 @@ router.get('/google/callback', async (req, res) => {
     }
     const token = getToken(user.id, user.name, user.email);
     res.cookie('jwt', token, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 });
-    res.redirect('http://localhost:5173/');
+    res.redirect(FRONTEND_URL);
   } catch (err) {
     console.error('OAuth callback error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
