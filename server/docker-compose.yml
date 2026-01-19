@@ -1,71 +1,35 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres:14-alpine
-    container_name: tf_db
-    restart: always
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: tfdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - backend
-
-  adminer:
-    image: adminer
-    container_name: tf_adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    networks:
-      - backend
-
   redis:
     image: redis:7-alpine
     container_name: tf_redis
     restart: always
-    ports:
-      - "6379:6379"
     networks:
       - backend
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: tf_api
     restart: always
     env_file:
       - .env
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgres://root:password@db:5432/tfdb?sslmode=disable
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      PORT: 8000
     volumes:
       - ./uploads:/app/uploads
     depends_on:
-      - db
-      - redis
+      redis:
+        condition: service_started
     networks:
       - backend
 
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: tf_worker
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    command: npx nodemon dist/workers/flowWorker.js 
+    command: npx nodemon dist/workers/flowWorker.js
+    env_file:
+      - .env
     volumes:
       - ./uploads:/app/uploads
     depends_on:
@@ -73,9 +37,6 @@ services:
     networks:
       - backend
 
-
-volumes:
-  pgdata:
-
 networks:
   backend:
+    driver: bridge

@@ -100,7 +100,7 @@ function CodeEditor() {
       </button>
 
       {/* Output display */}
-      <div className="bg-gray-800 p-2 rounded min-h-[50px]">
+      <div className="bg-gray-800 p-2 rounded min-h-12.5">
         <strong>Output:</strong>
         <pre>{output}</pre>
       </div>

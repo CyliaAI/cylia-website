@@ -85,7 +85,7 @@ export const ListWorkspace = () => {
               <div
                 key={index}
                 onClick={() => setSelectedTeam(team)}
-                className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-teal-500/30"
+                className="bg-linear-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-teal-500/30"
               >
                 <h3 className="text-xl font-semibold text-indigo-300 mb-2">{team.name}</h3>
                 <p className="text-gray-400 mb-4">{team.description}</p>
@@ -119,7 +119,7 @@ export const ListWorkspace = () => {
             {personalWorkspaces.map((project, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300 hover:shadow-teal-500/30"
+                className="bg-linear-to-br from-gray-800 to-gray-700 p-6 w-72 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300 hover:shadow-teal-500/30"
               >
                 <h3 className="text-xl font-semibold text-indigo-300  mb-2">{project.name}</h3>
                 <p className="text-gray-400 mb-2">{project.description}</p>

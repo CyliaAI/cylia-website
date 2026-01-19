@@ -13,7 +13,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 8000;
 app.use(
   cors({
-    origin: 'https://cylia.vercel.app',
+    origin: ['https://cylia.vercel.app', 'http://localhost:5173'],
     credentials: true,
   }),
 );

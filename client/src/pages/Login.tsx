@@ -91,9 +91,9 @@ const Login = () => {
   return (
     <Layout showFooter={false} showNavbar={false}>
       <div className="w-screen h-screen flex items-center justify-center bg-black">
-        <div className="w-[60vw] absolute z-[1] h-[80vh] bg-white/5 rounded-lg pointer-events-none overflow-hidden shadow-lg border border-white/60 flex">
+        <div className="w-[60vw] absolute z-1 h-[80vh] bg-white/5 rounded-lg pointer-events-none overflow-hidden shadow-lg border border-white/60 flex">
           <div
-            className={`w-[40%] p-10 text-white flex flex-col absolute left-[2vw] z-[11] justify-center top-[30vh] scale-150 items-center transition-all ${showSignUp ? 'opacity-100 pointer-events-auto delay-700' : 'opacity-0 pointer-events-none translate-y-10'}`}
+            className={`w-[40%] p-10 text-white flex flex-col absolute left-[2vw] z-11 justify-center top-[30vh] scale-150 items-center transition-all ${showSignUp ? 'opacity-100 pointer-events-auto delay-700' : 'opacity-0 pointer-events-none translate-y-10'}`}
           >
             <h2 className="text-white text-5xl font-semibold text-shadow-[0px_0px_16px_rgb(255,255,255)] animate-pulse">
               Join Us!
@@ -144,7 +144,7 @@ const Login = () => {
 
             <button
               onClick={handleLogin}
-              className="bg-gradient-to-r from-green-500 to-green-400 pointer-events-auto text-white font-semibold py-2 rounded-full shadow-md hover:opacity-90 transition-all"
+              className="bg-linear-to-r from-green-500 to-green-400 pointer-events-auto text-white font-semibold py-2 rounded-full shadow-md hover:opacity-90 transition-all"
             >
               Login
             </button>
@@ -173,12 +173,12 @@ const Login = () => {
 
           <div
             ref={panelRef}
-            className="relative z-10 right-[-30vw] top-[-42vh] w-1/2 h-[160vh] bg-gradient-to-tr from-green-600 to bg-emerald-400 pointer-events-none  backdrop-saturate-200 text-black text-center px-6 flex flex-col justify-center items-center rounded-lg origin-left"
+            className="relative z-10 right-[-30vw] top-[-42vh] w-1/2 h-[160vh] bg-linear-to-tr from-green-600 to bg-emerald-400 pointer-events-none  backdrop-saturate-200 text-black text-center px-6 flex flex-col justify-center items-center rounded-lg origin-left"
           />
 
           <div
             ref={signupRef}
-            className="w-1/2 p-10 text-white flex flex-col absolute right-[0vw] top-[5vh] justify-center"
+            className="w-1/2 p-10 text-white flex flex-col absolute right-0 top-[5vh] justify-center"
           >
             <h2 className="text-3xl font-bold mb-8">Sign Up</h2>
 
@@ -238,7 +238,7 @@ const Login = () => {
 
             <button
               onClick={handleLogin}
-              className="bg-gradient-to-r from-green-500 to-green-400 pointer-events-auto text-white font-semibold py-2 rounded-full shadow-md hover:opacity-90 transition-all"
+              className="bg-linear-to-r from-green-500 to-green-400 pointer-events-auto text-white font-semibold py-2 rounded-full shadow-md hover:opacity-90 transition-all"
             >
               Sign up
             </button>
@@ -257,7 +257,7 @@ const Login = () => {
             </p>
           </div>
           <div
-            className={`w-[40%] p-10 z-[11] text-white flex flex-col absolute pointer-events-none right-[3vw] justify-center top-[30vh] scale-150 items-center transition-all ${showSignUp ? 'opacity-0 pointer-events-none translate-y-10' : 'opacity-100 pointer-events-auto delay-700'}`}
+            className={`w-[40%] p-10 z-11 text-white flex flex-col absolute pointer-events-none right-[3vw] justify-center top-[30vh] scale-150 items-center transition-all ${showSignUp ? 'opacity-0 pointer-events-none translate-y-10' : 'opacity-100 pointer-events-auto delay-700'}`}
           >
             <h2 className="text-white text-2xl font-semibold text-shadow-[0px_0px_16px_rgb(255,255,255)] animate-pulse">
               Welcome Back User!

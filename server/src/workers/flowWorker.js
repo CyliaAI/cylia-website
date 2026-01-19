@@ -1,14 +1,12 @@
 import { Worker } from 'bullmq';
-import { flowQueue } from '../workers/flowQueue.js'; // BullMQ Queue instance
+import { flowQueue } from '../workers/flowQueue.js';
 import { sendMail } from '../utils/sendMail.js';
 import { extractTextFromFile } from '../utils/ocr.js';
 import { uploadFiles } from '../middlewares/uploadFiles.js';
 import { summarise, rag, toVectorDB } from '../utils/ml.js';
 import schedule from 'node-schedule';
 
-// Define Tasks which are asynchronous
 const Document = async (ctx) => {
-  // No Functionality as of now
   return ctx;
 };
 
@@ -63,7 +61,6 @@ const Schedule = async (ctx) => {
   const currentIndex = ctx.flow.indexOf('Schedule');
   const remainingFlow = ctx.flow.slice(currentIndex + 1);
 
-  // Make a Fresh Contact
   const newCtx = { ...ctx };
   newCtx.flow = remainingFlow;
   newCtx.content = '';
@@ -84,7 +81,7 @@ const LLM = async (ctx) => {
   if (summary) ctx.content = summary;
   return ctx;
 };
-// Map of Task Names
+
 const taskMap = {
   Document,
   FiletoText,
@@ -97,12 +94,11 @@ const taskMap = {
   Output,
 };
 
-// --- Create a worker ---
 const worker = new Worker(
   flowQueue.name,
   async (job) => {
     const { flow, data } = job.data;
-    let context = { ...data, flow: [...flow] }; // clone flow into context
+    let context = { ...data, flow: [...flow] };
 
     for (const step of flow.slice()) {
       if (context.skip) break;
@@ -119,6 +115,6 @@ const worker = new Worker(
     concurrency: 5,
   },
 );
-// --- Listen to events ---
+
 worker.on('completed', (job) => {});
 worker.on('failed', (job, err) => console.error(`Job ${job.id} failed:`, err));

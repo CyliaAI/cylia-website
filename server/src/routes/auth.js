@@ -11,7 +11,6 @@ const router = Router();
 
 const CLIENT = process.env.GOOGLE_CLIENT;
 const SECRET = process.env.GOOGLE_SECRET;
-const PASS = process.env.GOOGLE_PASS;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 
 const getToken = (id, name, email, role) => {
@@ -43,7 +42,7 @@ router.get('/google/callback', async (req, res) => {
       new URLSearchParams({
         code,
         client_id: CLIENT,
-        client_secret: PASS,
+        client_secret: SECRET,
         redirect_uri: GOOGLE_REDIRECT_URI,
         grant_type: 'authorization_code',
       }),
